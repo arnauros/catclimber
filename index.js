@@ -40,8 +40,7 @@ async function displaySegmentData() {
   const segmentData = fetchSingleSegment();
 
   if (segmentData) {
-    document.getElementById("categoryName").textContent =
-      segmentData.climb_category_desc || "N/A";
+    document.getElementById("categoryName").textContent = "a";
     console.log("yes");
   }
 }
