@@ -106,6 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Example call to display the segment data
-  const initialSegmentId = "229781"; // Example segment ID (Hawk Hill)
+  const initialSegmentId = "5126312"; // Example segment ID
   displaySegmentData(initialSegmentId);
 });
