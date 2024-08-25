@@ -1,6 +1,6 @@
 // getting id's and naming them
-const categoryIncline = document.getElementById("categoryName").textContent;
-console.log(categoryIncline);
+const categoryElement = document.getElementById("categoryName").textContent;
+console.log(categoryElement);
 
 // function to fetch segment from strava
 async function fetchSingleSegment() {
@@ -35,3 +35,12 @@ async function fetchSingleSegment() {
 }
 
 fetchSingleSegment(); // Call the function to execute it
+
+async function displaySegmentData() {
+  const segmentData = await fetchSingleSegment();
+
+  if (segmentData) {
+    document.getElementById("categoryName").textContent =
+      segmentData.climb_category_desc || "N/A";
+  }
+}
