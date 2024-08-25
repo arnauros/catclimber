@@ -37,7 +37,7 @@ async function fetchSingleSegment() {
 // fetchSingleSegment(); // Call the function to execute it
 
 async function displaySegmentData() {
-  const segmentData = await fetchSingleSegment();
+  const segmentData = fetchSingleSegment();
 
   if (segmentData) {
     document.getElementById("categoryName").textContent =
