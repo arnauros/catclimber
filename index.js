@@ -39,14 +39,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     const segmentData = await fetchSingleSegment(); // Fetch segment data
 
     if (segmentData) {
-      // Display the segment name
-      const segmentNamePublic = segmentData.name;
-      document.getElementById("segmentName").textContent = segmentNamePublic;
-
-      // Display the segment distance
-      const segmentDistance = segmentData.distance;
-      document.getElementById("lengthClimb").textContent = segmentDistance;
-
       // Mapping climb category to a more descriptive text
       const climbCategoryDescriptions = {
         0: "HC (Hors Catégorie)",
@@ -65,6 +57,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       const description = climbCategoryDescriptions[climbCategory] || "N/A";
       document.getElementById("categoryName").textContent = description;
       console.log("Segment data displayed successfully.");
+
+      // Display the segment name
+      const segmentNamePublic = segmentData.name;
+      document.getElementById("segmentName").textContent = segmentNamePublic;
+
+      // Convert and display the distance
+      const distanceMeters = segmentData.distance;
+      const distanceKm = (distanceMeters / 1000).toFixed(2);
+      console.log("Distance in km:", distanceKm);
+      document.getElementById("distance").textContent = `${distanceKm} km`;
     } else {
       console.log("No segment data found.");
     }
