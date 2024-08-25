@@ -40,11 +40,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (segmentData) {
       // Display the segment name
-      const segmentName = segmentData.name;
-      console.log("Segment Name:", segmentName); // Log the
+      const segmentNamePublic = segmentData.name;
+      console.log("Segment Name:", segmentNamePublic); // Log the
 
       // Display the segment name
-      document.getElementById("segmentName").textContent = segmentName;
+      document.getElementById("segmentName").textContent = segmentNamePublic;
 
       // Mapping climb category to a more descriptive text
       const climbCategoryDescriptions = {
