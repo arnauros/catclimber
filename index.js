@@ -4,7 +4,7 @@ async function fetchClimbs() {
     const activityType = "riding"; // Change to 'running' if needed
 
     const response = await fetch(
-      "https://www.strava.com/api/v3/segments/explore?bounds=${bounds}&activity_type=${activityType}",
+      "https://www.strava.com/api/v3/segments/10959819",
       {
         method: "GET",
         headers: {
