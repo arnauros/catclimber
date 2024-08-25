@@ -25,9 +25,9 @@ async function fetchClimbs() {
   }
 }
 
-displayClimbs();
+fetchClimbs();
 console.log(data);
 
-async function displayClimbs() {
-  const climbsData = await fetchClimbs();
-}
+// async function displayClimbs() {
+//   const climbsData = await fetchClimbs();
+// }
