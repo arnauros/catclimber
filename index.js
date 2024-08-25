@@ -39,6 +39,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     const segmentData = await fetchSingleSegment(); // Fetch segment data
 
     if (segmentData) {
+      // Display the segment name
+      const segmentName = segmentData.name;
+      console.log("Segment Name:", segmentName); // Log the
+
+      // Display the segment name
+      document.getElementById("segmentName").textContent = segmentName;
+
       // Mapping climb category to a more descriptive text
       const climbCategoryDescriptions = {
         0: "HC (Hors Catégorie)",
