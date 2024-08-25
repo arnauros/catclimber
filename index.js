@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const distanceMeters = segmentData.distance;
       const distanceKm = (distanceMeters / 1000).toFixed(2);
       console.log("Distance in km:", distanceKm);
-      document.getElementById("distance").textContent = `${distanceKm} km`;
+      document.getElementById("lengthClimb").textContent = `${distanceKm} km`;
     } else {
       console.log("No segment data found.");
     }
