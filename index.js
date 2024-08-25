@@ -1,5 +1,8 @@
 async function fetchClimbs() {
   try {
+    const bounds = "37.821362,-122.505373,37.842038,-122.465977"; // Example bounding box coordinates
+    const activityType = "riding"; // Change to 'running' if needed
+
     const response = await fetch(
       "https://www.strava.com/api/v3/segments/explore",
       {
