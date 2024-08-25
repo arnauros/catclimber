@@ -1,6 +1,6 @@
 // getting id's and naming them
 const categoryElement = document.getElementById("categoryName").textContent;
-console.log(categoryElement);
+// console.log(categoryElement);
 
 // function to fetch segment from strava
 async function fetchSingleSegment() {
@@ -34,7 +34,7 @@ async function fetchSingleSegment() {
   }
 }
 
-fetchSingleSegment(); // Call the function to execute it
+// fetchSingleSegment(); // Call the function to execute it
 
 async function displaySegmentData() {
   const segmentData = await fetchSingleSegment();
