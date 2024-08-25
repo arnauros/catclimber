@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (segmentData) {
       // Get the element by ID and set its text content
       document.getElementById("categoryName").textContent =
-        segmentData.climb_category_desc || "N/A";
+        segmentData.climb_category || "N/A";
       console.log("Segment data displayed successfully.");
     } else {
       console.log("No segment data found.");
