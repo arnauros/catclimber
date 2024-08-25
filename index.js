@@ -1,5 +1,11 @@
-// getting id's and naming them
-// Ensure categoryElement is defined
+// Description: This file contains the JavaScript code for the Strava API project.  
+'use strict'
+
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("Script loaded and DOM fully parsed");
+  
+  
+  // Ensure categoryElement is defined
 const categoryElement = document.getElementById("categoryName");
 
 // function to fetch segment from strava
