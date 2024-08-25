@@ -21,3 +21,9 @@ async function fetchClimbs() {
     console.error("Fetch error:", error);
   }
 }
+
+displayClimbs();
+
+async function displayClimbs() {
+  const climbsData = await fetchClimbs();
+}
