@@ -2,6 +2,7 @@
 const categoryIncline = document.getElementById("categoryName").textContent;
 console.log(categoryIncline);
 
+// function to fetch segment from strava
 async function fetchSingleSegment() {
   try {
     // Specify the segment ID
@@ -34,5 +35,3 @@ async function fetchSingleSegment() {
 }
 
 fetchSingleSegment(); // Call the function to execute it
-
-displaySingleSegment(); // Call the function to display the segment data
