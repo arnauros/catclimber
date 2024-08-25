@@ -1,3 +1,5 @@
+const categoryIncline = document.getElementById("categoryName");
+console.log(categoryIncline);
 async function fetchSingleSegment() {
   try {
     // Specify the segment ID
@@ -30,3 +32,30 @@ async function fetchSingleSegment() {
 }
 
 fetchSingleSegment(); // Call the function to execute it
+
+async function displaySingleSegment() {
+  const segmentData = await fetchSingleSegment();
+
+  if (segmentData) {
+    const segmentContainer = document.getElementById("climbContainer");
+    segmentContainer.innerHTML = ""; // Clear previous content
+
+    const segmentElement = document.createElement("div");
+    segmentElement.className = "climbItem";
+    segmentElement.innerHTML = `
+            <h3>${segmentData.name}</h3>
+            <p>Average Grade: ${segmentData.average_grade}%</p>
+            <p>Elevation Gain: ${
+              segmentData.elevation_high - segmentData.elevation_low
+            } meters</p>
+            <p>Distance: ${(segmentData.distance / 1000).toFixed(2)} km</p>
+        `;
+    segmentContainer.appendChild(segmentElement);
+  } else {
+    console.log("No segment data available.");
+    document.getElementById("climbContainer").innerHTML =
+      "<p>No segment data found.</p>";
+  }
+}
+
+displaySingleSegment(); // Call the function to display the segment data
