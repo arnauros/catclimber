@@ -1,33 +1,32 @@
-async function fetchClimbs() {
+async function fetchSingleSegment() {
   try {
-    const bounds = "37.821362,-122.505373,37.842038,-122.465977"; // Example bounding box coordinates
-    const activityType = "riding"; // Change to 'running' if needed
+    // Specify the segment ID
+    const segmentId = "10959819";
+    const url = `https://www.strava.com/api/v3/segments/${segmentId}`;
 
-    const response = await fetch(
-      "https://www.strava.com/api/v3/segments/10959819",
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1",
-        },
-      }
-    );
+    // Make the API request
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1",
+      },
+    });
 
+    // Check if the request was successful
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Response text:", errorText);
       throw new Error("Network response was not ok");
     }
 
+    // Parse the JSON data
     const data = await response.json();
-    console.log(data); // You can inspect the data to see the structure
+    console.log("API called successfully. Returned data:", data);
+
     return data;
   } catch (error) {
     console.error("Fetch error:", error);
   }
 }
 
-fetchClimbs();
-console.log(data);
-
-// async function displayClimbs() {
-//   const climbsData = await fetchClimbs();
-// }
+fetchSingleSegment(); // Call the function to execute it
