@@ -1,10 +1,6 @@
 // getting id's and naming them
 // Ensure categoryElement is defined
 const categoryElement = document.getElementById("categoryName");
-if (!categoryElement) {
-  console.error("Element with ID 'categoryName' not found.");
-  return;
-}
 
 // function to fetch segment from strava
 async function fetchSingleSegment() {
