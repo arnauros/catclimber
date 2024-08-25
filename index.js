@@ -1,57 +1,53 @@
-// Description: This file contains the JavaScript code for the Strava API project.
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function () {
+// Ensure the DOM is fully loaded before running the script
+document.addEventListener("DOMContentLoaded", async function () {
   console.log("Script loaded and DOM fully parsed");
 
-  // Ensure categoryElement is defined
-  const categoryElement = document.getElementById("categoryName");
-
-  // function to fetch segment from strava
+  // Function to fetch a segment from Strava
   async function fetchSingleSegment() {
     try {
-      // Specify the segment ID
-      const segmentId = "10959819";
+      const segmentId = "10959819"; // The specific segment ID
       const url = `https://www.strava.com/api/v3/segments/${segmentId}`;
 
       // Make the API request
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1",
+          Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1", // Replace with your valid token
         },
       });
 
       // Check if the request was successful
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response text:", errorText);
-        throw new Error("Network response was not ok");
+        console.error("Error fetching segment:", response.statusText);
+        return null; // Return null to indicate failure
       }
 
-      // Parse the JSON data
+      // Parse and return the JSON data
       const data = await response.json();
       console.log("API called successfully. Returned data:", data);
-
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
+      return null; // Return null on exception
     }
   }
 
-  // fetchSingleSegment(); // Call the function to execute it
-
+  // Function to display the segment data
   async function displaySegmentData() {
-    console.log("Displaying segment data...");
-    const segmentData = await fetchSingleSegment();
+    const segmentData = await fetchSingleSegment(); // Fetch segment data
 
     if (segmentData) {
-      categoryElement.textContent = "a";
-      console.log("yes");
+      // Get the element by ID and set its text content
+      document.getElementById("categoryName").textContent =
+        segmentData.climb_category_desc || "N/A";
+      console.log("Segment data displayed successfully.");
     } else {
       console.log("No segment data found.");
     }
   }
-});
 
-displaySegmentData();
+  // Call the function to display the segment data
+  displaySegmentData();
+});
