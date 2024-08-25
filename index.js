@@ -1,5 +1,7 @@
-const categoryIncline = document.getElementById("categoryName");
+// getting id's and naming them
+const categoryIncline = document.getElementById("categoryName").textContent;
 console.log(categoryIncline);
+
 async function fetchSingleSegment() {
   try {
     // Specify the segment ID
