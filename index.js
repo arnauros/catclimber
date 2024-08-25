@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         2: "Category 2",
         3: "Category 3",
         4: "Category 4",
+        5: "Category HC",
       };
 
       // Get the climb category from the segment data
