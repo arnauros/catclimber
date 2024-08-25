@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1", // Replace with your valid token
+          Authorization: "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1",
         },
       });
 
@@ -39,9 +39,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     const segmentData = await fetchSingleSegment(); // Fetch segment data
 
     if (segmentData) {
-      // Get the element by ID and set its text content
-      document.getElementById("categoryName").textContent =
-        segmentData.climb_category || "N/A";
+      // Mapping climb category to a more descriptive text
+      const climbCategoryDescriptions = {
+        0: "HC (Hors Catégorie)",
+        1: "Category 1",
+        2: "Category 2",
+        3: "Category 3",
+        4: "Category 4",
+      };
+
+      // Get the climb category from the segment data
+      const climbCategory = segmentData.climb_category;
+      console.log("Climb Category:", climbCategory); // Log the climb category
+
+      // Map the climb category to its description or use "N/A" if not found
+      const description = climbCategoryDescriptions[climbCategory] || "N/A";
+      document.getElementById("categoryName").textContent = description;
       console.log("Segment data displayed successfully.");
     } else {
       console.log("No segment data found.");
