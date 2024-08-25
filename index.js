@@ -23,6 +23,7 @@ async function fetchClimbs() {
 }
 
 displayClimbs();
+console.log(data);
 
 async function displayClimbs() {
   const climbsData = await fetchClimbs();
