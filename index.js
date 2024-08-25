@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Function to fetch a segment from Strava
   async function fetchSingleSegment() {
     try {
-      const segmentId = "10959819"; // The specific segment ID
+      const segmentId = "4629741"; // The specific segment ID
       const url = `https://www.strava.com/api/v3/segments/${segmentId}`;
 
       // Make the API request
