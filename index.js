@@ -41,10 +41,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (segmentData) {
       // Display the segment name
       const segmentNamePublic = segmentData.name;
-      console.log("Segment Name:", segmentNamePublic); // Log the
-
-      // Display the segment name
       document.getElementById("segmentName").textContent = segmentNamePublic;
+
+      // Display the segment distance
+      const segmentDistance = segmentData.distance;
+      document.getElementById("lengthClimb").textContent = segmentDistance;
 
       // Mapping climb category to a more descriptive text
       const climbCategoryDescriptions = {
