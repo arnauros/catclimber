@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (segmentData) {
       // Mapping climb category to a more descriptive text
       const climbCategoryDescriptions = {
-        0: "HC (Hors Catégorie)",
+        0: "Category HC",
         1: "Category 1",
         2: "Category 2",
         3: "Category 3",
