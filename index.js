@@ -37,18 +37,11 @@ async function fetchSingleSegment() {
 // fetchSingleSegment(); // Call the function to execute it
 
 async function displaySegmentData() {
-  console.log("Fetching segment data...");
   const segmentData = await fetchSingleSegment();
-  console.log("Segment data fetched:", segmentData);
 
   if (segmentData) {
-    const categoryNameElement = document.getElementById("categoryName");
-    if (categoryNameElement) {
-      categoryNameElement.textContent = "a";
-      console.log("yes");
-    } else {
-      console.log("Element with ID 'categoryName' not found.");
-    }
+    categoryElement.textContent = "a";
+    console.log("yes");
   } else {
     console.log("No segment data found.");
   }
