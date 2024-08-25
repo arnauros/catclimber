@@ -42,5 +42,6 @@ async function displaySegmentData() {
   if (segmentData) {
     document.getElementById("categoryName").textContent =
       segmentData.climb_category_desc || "N/A";
+    console.log("yes");
   }
 }
