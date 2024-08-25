@@ -37,6 +37,7 @@ async function fetchSingleSegment() {
 // fetchSingleSegment(); // Call the function to execute it
 
 async function displaySegmentData() {
+  console.log("Displaying segment data...");
   const segmentData = await fetchSingleSegment();
 
   if (segmentData) {
