@@ -193,7 +193,6 @@ function calculateClimbCategory(length, gradient) {
 ///////////////////// Finding the climbs ///////////////////////
 
 function fetchClimbData(location, radius = 50) {
-  const bbox = getBoundingBox(location, radius);
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
@@ -210,18 +209,6 @@ function fetchClimbData(location, radius = 50) {
       findClimbs(elevationPoints);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
-}
-
-function getBoundingBox(location, radiusKm) {
-  const earthRadius = 6371; // km
-  const lat = (location[1] * Math.PI) / 180;
-  const lon = (location[0] * Math.PI) / 180;
-  const dLat = radiusKm / earthRadius;
-  const dLon = Math.asin(Math.sin(dLat) / Math.cos(lat));
-
-  return [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(
-    (rad) => (rad * 180) / Math.PI
-  );
 }
 
 function findClimbs(elevationPoints) {
@@ -253,8 +240,6 @@ function findClimbs(elevationPoints) {
 }
 
 function calculateDistance(points) {
-  // Implement distance calculation between points
-  // This is a simplified version, you might want to use a more accurate method
   let distance = 0;
   for (let i = 1; i < points.length; i++) {
     const dx = points[i].coordinates[0] - points[i - 1].coordinates[0];
@@ -301,7 +286,6 @@ function displayClimbs(climbs) {
       },
     });
 
-    // Add a marker for the start of the climb
     new mapboxgl.Marker()
       .setLngLat(climb.coordinates[0])
       .setPopup(
