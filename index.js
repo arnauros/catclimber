@@ -182,6 +182,8 @@ function fetchClimbData(location, radius = 500) {
         return;
       }
       console.log("Raw data received:", data);
+
+      // Define and calculate climbs
       const elevationPoints = data.features.map((feature) => ({
         coordinates: feature.geometry.coordinates,
         elevation: feature.properties.ele,
@@ -355,7 +357,7 @@ function initializeMap() {
 }
 
 /////////////////////// test line /////////////////////////////////
-
+/* TEST CODE FOR THE LINE
 // Function to add a test line on the map
 function addTestLine() {
   console.log("line added");
@@ -393,3 +395,4 @@ function addTestLine() {
 
   console.log("Test line added to the map.");
 }
+*/
