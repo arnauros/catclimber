@@ -193,17 +193,35 @@ function calculateClimbCategory(length, gradient) {
 ///////////////////// Finding the climbs ///////////////////////
 
 function fetchClimbData(location, radius = 50) {
-  const destination = [location[0] + 0.1, location[1] + 0.1]; // Adjust the destination point slightly for simplicity
-  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${location[0]},${location[1]};${destination[0]},${destination[1]}?geometries=geojson&access_token=${mapboxToken}`;
+  const bbox = getBoundingBox(location, radius);
+  const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
+    location[0]
+  },${location[1]}.json?radius=${
+    radius * 1000
+  }&limit=50&access_token=${mapboxToken}`;
 
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      console.log("Climb data fetched:", data);
-      // Here we would process the data to extract relevant information
-      // For now, just log the data to understand its structure
+      const elevationPoints = data.features.map((feature) => ({
+        coordinates: feature.geometry.coordinates,
+        elevation: feature.properties.ele,
+      }));
+      findClimbs(elevationPoints);
     })
-    .catch((error) => console.error("Error fetching climb data:", error));
+    .catch((error) => console.error("Error fetching elevation data:", error));
+}
+
+function getBoundingBox(location, radiusKm) {
+  const earthRadius = 6371; // km
+  const lat = (location[1] * Math.PI) / 180;
+  const lon = (location[0] * Math.PI) / 180;
+  const dLat = radiusKm / earthRadius;
+  const dLon = Math.asin(Math.sin(dLat) / Math.cos(lat));
+
+  return [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(
+    (rad) => (rad * 180) / Math.PI
+  );
 }
 
 // Function to display climbs on the map
