@@ -214,8 +214,9 @@ function findClimbs(elevationPoints) {
       console.log(
         `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
       );
-      if (totalElevationGain > 20 && currentClimb.length > 2) {
-        // Example criteria for a climb
+      // Adjust the minimum criteria for elevation gain and length
+      if (totalElevationGain > 100 && currentClimb.length > 5) {
+        // Increase elevation gain threshold to 100m and length to 5 points
         climbs.push({
           name: `Climb ${climbs.length + 1}`,
           coordinates: currentClimb.map((point) => point.coordinates),
