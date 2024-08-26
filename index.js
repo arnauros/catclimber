@@ -188,7 +188,7 @@ function calculateClimbCategory(length, gradient) {
   return null; // Default case, though it should not be reached
 }
 
-// Function to fetch climb data using Mapbox API
+// Function to fetch climb data using the Mapbox API
 function fetchClimbData(location, radius = 50) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
@@ -205,12 +205,12 @@ function fetchClimbData(location, radius = 50) {
         elevation: feature.properties.ele,
       }));
       const climbs = findClimbs(elevationPoints);
-      displayClimbs(climbs);
+      console.log("Climbs found:", climbs); // Logging climbs found to check the data
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-// Function to find climbs based on elevation points
+// Function to find potential climbs based on elevation points
 function findClimbs(elevationPoints) {
   console.log("Elevation points received:", elevationPoints.length);
   const climbs = [];
@@ -228,7 +228,7 @@ function findClimbs(elevationPoints) {
         `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
       );
       if (totalElevationGain > 20 && currentClimb.length > 2) {
-        // Lowered criteria
+        // Example criteria for a climb
         climbs.push({
           name: `Climb ${climbs.length + 1}`,
           coordinates: currentClimb.map((point) => point.coordinates),
