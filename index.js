@@ -208,7 +208,16 @@ function fetchClimbData(location, radius = 50) {
 
 function displayClimbs(climbs) {
   map.on("load", function () {
-    // Ensure map is loaded
+    // Ensure the map is fully loaded
+    const layers = map.getStyle().layers;
+    let firstSymbolId;
+    for (const layer of layers) {
+      if (layer.type === "symbol") {
+        firstSymbolId = layer.id;
+        break;
+      }
+    }
+
     climbs.forEach((climb) => {
       if (climb.category) {
         // Add a marker at the start of the route
@@ -229,22 +238,25 @@ function displayClimbs(climbs) {
         };
 
         // Add the route as a layer to the map
-        map.addLayer({
-          id: `route-${Math.random()}`, // Unique ID for each route
-          type: "line",
-          source: {
-            type: "geojson",
-            data: routeGeoJSON,
+        map.addLayer(
+          {
+            id: `route-${Math.random()}`, // Unique ID for each route
+            type: "line",
+            source: {
+              type: "geojson",
+              data: routeGeoJSON,
+            },
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#FF5733", // Customize the color
+              "line-width": 4, // Customize the line width
+            },
           },
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#FF5733", // Customize the color
-            "line-width": 4, // Customize the line width
-          },
-        });
+          firstSymbolId
+        ); // Add the layer beneath the first symbol layer
       }
     });
   });
