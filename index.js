@@ -200,7 +200,7 @@ function fetchClimbData(location, radius = 5000) {
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-//circle draw area
+///////////////////////////////////circle draw area
 function drawSearchArea(location, radiusInMeters) {
   const searchAreaSourceId = "search-area";
   const searchAreaLayerId = "search-area-layer";
