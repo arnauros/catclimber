@@ -209,18 +209,24 @@ function fetchClimbData(location, radius = 50) {
 function displayClimbs(climbs) {
   map.on("load", function () {
     // Ensure the map is fully loaded
+    console.log("Map loaded, ready to add climbs.");
+
     const layers = map.getStyle().layers;
     let firstSymbolId;
     for (const layer of layers) {
       if (layer.type === "symbol") {
         firstSymbolId = layer.id;
+        console.log("First symbol layer ID:", firstSymbolId);
         break;
       }
     }
 
-    climbs.forEach((climb) => {
+    climbs.forEach((climb, index) => {
       if (climb.category) {
         // Add a marker at the start of the route
+        console.log(
+          `Adding marker for climb: ${climb.name}, Category: ${climb.category}`
+        );
         new mapboxgl.Marker()
           .setLngLat(climb.coordinates[0]) // Start of the route
           .setPopup(
@@ -237,10 +243,11 @@ function displayClimbs(climbs) {
           },
         };
 
+        console.log(`Adding route layer for climb: ${climb.name}`);
         // Add the route as a layer to the map
         map.addLayer(
           {
-            id: `route-${Math.random()}`, // Unique ID for each route
+            id: `route-${index}`, // Unique ID for each route
             type: "line",
             source: {
               type: "geojson",
