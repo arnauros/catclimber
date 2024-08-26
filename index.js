@@ -271,6 +271,7 @@ function addSearchAreaToMap(coordinates, sourceId, layerId) {
   });
 }
 
+/*
 // Function to find potential climbs based on elevation points
 function findClimbs(elevationPoints) {
   console.log("Elevation points received:", elevationPoints.length);
@@ -348,6 +349,7 @@ function calculateClimbCategory(length, gradient) {
   return null; // Default case, though it should not be reached
 }
 
+*/
 ////////////////// working well //////////////////////
 
 // Function to visualize the climbs on the map
