@@ -190,3 +190,79 @@ function fetchClimbData(location, radius = 50) {
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
+
+// Function to find potential climbs based on elevation points
+function findClimbs(elevationPoints) {
+  console.log("Elevation points received:", elevationPoints.length);
+  const climbs = [];
+  let currentClimb = [];
+  let totalElevationGain = 0;
+
+  for (let i = 1; i < elevationPoints.length; i++) {
+    const elevationDiff =
+      elevationPoints[i].elevation - elevationPoints[i - 1].elevation;
+    if (elevationDiff > 0) {
+      currentClimb.push(elevationPoints[i]);
+      totalElevationGain += elevationDiff;
+    } else if (currentClimb.length > 0) {
+      console.log(
+        `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
+      );
+      if (totalElevationGain > 20 && currentClimb.length > 2) {
+        // Example criteria for a climb
+        climbs.push({
+          name: `Climb ${climbs.length + 1}`,
+          coordinates: currentClimb.map((point) => point.coordinates),
+          elevationGain: totalElevationGain,
+          length: calculateDistance(currentClimb),
+          category: calculateClimbCategory(
+            calculateDistance(currentClimb),
+            totalElevationGain
+          ),
+        });
+        console.log("Climb added");
+      }
+      currentClimb = [];
+      totalElevationGain = 0;
+    }
+  }
+
+  console.log(`Total climbs found: ${climbs.length}`);
+  return climbs;
+}
+
+// Function to calculate the distance between points
+function calculateDistance(points) {
+  let distance = 0;
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].coordinates[0] - points[i - 1].coordinates[0];
+    const dy = points[i].coordinates[1] - points[i - 1].coordinates[1];
+    distance += Math.sqrt(dx * dx + dy * dy);
+  }
+  return distance * 111000; // Rough conversion to meters
+}
+
+// Function to calculate the climb category based on length and gradient
+function calculateClimbCategory(length, gradient) {
+  const score = length * gradient;
+
+  // Ensure the climb meets the minimum criteria
+  if (gradient < 3 || score < 8000) {
+    return null; // Not categorized
+  }
+
+  // Categorize based on the score
+  if (score >= 80000) {
+    return "Hors Catégorie";
+  } else if (score >= 64000) {
+    return "Category 1";
+  } else if (score >= 32000) {
+    return "Category 2";
+  } else if (score >= 16000) {
+    return "Category 3";
+  } else if (score >= 8000) {
+    return "Category 4";
+  }
+
+  return null; // Default case, though it should not be reached
+}
