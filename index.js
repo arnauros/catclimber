@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //Mapbox PROJECT STARTS HERE
 
 // Global Variables
-const mapContainerId = "map"; // ID of the div where the map will be rendered
+const mapContainerId = "map"; // ID of the map div
 const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
@@ -142,8 +142,7 @@ function initializeMap() {
   // Initialize the map
   const map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/streets-v11", // Style of the map
-    center: defaultLocation, // Default center location
+    center: [41.861622, 3.07258], // Default center location
     zoom: 10, // Default zoom level
   });
 }
