@@ -13,6 +13,7 @@ let map; // Declare map variable globally so it can be accessed by other functio
 document.addEventListener("DOMContentLoaded", function () {
   initializeMap(); // Call the function to initialize the map
   setupSearch(); // Call the function to setup the search functionality
+  setupGeolocation(); // Set up geolocation functionality
 });
 
 // Function to initialize the map
