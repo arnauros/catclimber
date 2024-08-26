@@ -259,6 +259,7 @@ function displayClimbs(climbs) {
     map.on("load", () => {
       // Use the map center as the location to fetch climbs
       const center = map.getCenter();
+      console.log("Fetching climbs for:", center);
       fetchClimbData([center.lng, center.lat]);
     });
     return;
