@@ -268,3 +268,43 @@ function calculateClimbCategory(length, gradient) {
 }
 
 //working well
+
+// Function to visualize the climbs on the map
+function visualizeClimbs(climbs) {
+  if (!map.loaded()) {
+    map.on("load", () => visualizeClimbs(climbs));
+    return;
+  }
+
+  climbs.forEach((climb, index) => {
+    // Add a source for the climb route
+    map.addSource(`climb-source-${index}`, {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: climb.coordinates,
+        },
+      },
+    });
+
+    // Add a layer to visualize the climb route
+    map.addLayer({
+      id: `climb-layer-${index}`,
+      type: "line",
+      source: `climb-source-${index}`,
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#FF5733", // Customize the color as needed
+        "line-width": 4,
+      },
+    });
+
+    // Add a marker at the start of the climb
+  });
+}
