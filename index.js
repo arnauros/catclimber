@@ -230,14 +230,3 @@ function findClimbs(elevationPoints) {
   console.log(`Total climbs found: ${climbs.length}`);
   return climbs;
 }
-
-// Function to calculate the distance between points
-function calculateDistance(points) {
-  let distance = 0;
-  for (let i = 1; i < points.length; i++) {
-    const dx = points[i].coordinates[0] - points[i - 1].coordinates[0];
-    const dy = points[i].coordinates[1] - points[i - 1].coordinates[1];
-    distance += Math.sqrt(dx * dx + dy * dy);
-  }
-  return distance * 111000; // Rough conversion to meters
-}
