@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     locateUser(); // Call the function to locate the user after map is loaded
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
-    addTestLine(); // Add a test line to the map
+    // addTestLine(); // Add a test line to the map
   });
 });
 
@@ -360,7 +360,7 @@ function initializeMap() {
 /////////////////////// test line /////////////////////////////////
 // TEST CODE FOR THE LINE
 // Function to add a test line on the map
-// /*
+/*
 function addTestLine() {
   console.log("line added");
   const testLineCoordinates = [
@@ -397,5 +397,5 @@ function addTestLine() {
 
   console.log("Test line added to the map.");
 }
-// */
+*/
 // Function to fetch the route using Mapbox Directions API and plot it on the map
