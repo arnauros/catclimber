@@ -334,3 +334,42 @@ function visualizeClimbs(climbs) {
 }
 
 // Wait until the map is fully loaded before adding the line
+// Wait until the map is fully loaded before adding the line
+map.on("load", () => {
+  // Define the coordinates for the test line
+  const testLineCoordinates = [
+    [3.10093, 41.85876], // Starting point
+    [3.10017, 41.85855], // Ending point
+    [3.2, 41.9], // Another random point
+  ];
+
+  // Add a new source for your test line data
+  map.addSource("test-line-source", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: testLineCoordinates,
+      },
+    },
+  });
+
+  // Add a new layer to visualize the test line
+  map.addLayer({
+    id: "test-line-layer",
+    type: "line",
+    source: "test-line-source",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "#FF0000", // Red color for the line
+      "line-width": 5, // Line width in pixels
+    },
+  });
+
+  console.log("Test line added to the map.");
+});
