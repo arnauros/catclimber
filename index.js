@@ -267,7 +267,7 @@ function calculateClimbCategory(length, gradient) {
   return null; // Default case, though it should not be reached
 }
 
-//working well
+////////////////// working well //////////////////////
 
 // Function to visualize the climbs on the map
 function visualizeClimbs(climbs) {
@@ -277,8 +277,9 @@ function visualizeClimbs(climbs) {
   }
 
   climbs.forEach((climb, index) => {
-    // Logging the coordinates of each climb
-    console.log(`Visualizing Climb ${index + 1}:`, climb.coordinates);
+    console.log(
+      `Visualizing climb: ${climb.name} with ${climb.coordinates.length} points`
+    );
 
     // Add a source for the climb route
     map.addSource(`climb-source-${index}`, {
@@ -292,6 +293,9 @@ function visualizeClimbs(climbs) {
         },
       },
     });
+
+    // Log if the source is added successfully
+    console.log(`Added source for climb ${index}`);
 
     // Add a layer to visualize the climb route
     map.addLayer({
@@ -308,6 +312,9 @@ function visualizeClimbs(climbs) {
       },
     });
 
+    // Log if the layer is added successfully
+    console.log(`Added layer for climb ${index}`);
+
     // Add a marker at the start of the climb
     new mapboxgl.Marker()
       .setLngLat(climb.coordinates[0])
@@ -321,5 +328,7 @@ function visualizeClimbs(climbs) {
         )
       )
       .addTo(map);
+
+    console.log(`Added marker for climb ${index}`);
   });
 }
