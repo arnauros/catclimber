@@ -142,7 +142,7 @@ function initializeMap() {
   // Initialize the map
   const map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    center: [41.861622, 3.07258], // Default center location
+    center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
 }
