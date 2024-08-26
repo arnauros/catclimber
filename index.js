@@ -337,8 +337,8 @@ function visualizeClimbs(climbs) {
 map.on("load", function () {
   // Define the coordinates for the line
   const lineCoordinates = [
-    [2.154007, 41.390205], // Starting point (Barcelona)
-    [2.175022, 41.385064], // Another point in Barcelona
+    [3.10093, 41.85876], // Starting point (Barcelona)
+    [3.10017, 41.85855], // Another point in Barcelona
   ];
 
   // Add a new source for the line
