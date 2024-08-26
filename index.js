@@ -212,6 +212,7 @@ function fetchClimbData(location, radius = 50) {
 }
 
 function findClimbs(elevationPoints) {
+  console.log("Elevation points received:", elevationPoints.length);
   const climbs = [];
   let currentClimb = [];
   let totalElevationGain = 0;
@@ -223,20 +224,24 @@ function findClimbs(elevationPoints) {
       currentClimb.push(elevationPoints[i]);
       totalElevationGain += elevationDiff;
     } else if (currentClimb.length > 0) {
+      console.log(
+        `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
+      );
       if (totalElevationGain > 100 && currentClimb.length > 5) {
-        // Minimum 100m elevation gain and 5 points
         climbs.push({
           coordinates: currentClimb.map((point) => point.coordinates),
           elevationGain: totalElevationGain,
           length: calculateDistance(currentClimb),
         });
+        console.log("Climb added");
       }
       currentClimb = [];
       totalElevationGain = 0;
     }
   }
 
-  displayClimbs(climbs);
+  console.log(`Total climbs found: ${climbs.length}`);
+  return climbs;
 }
 
 function calculateDistance(points) {
