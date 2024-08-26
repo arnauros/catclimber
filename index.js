@@ -1,19 +1,19 @@
 "use strict";
 
-//Mapbox PROJECT STARTS HERE
+// Mapbox PROJECT STARTS HERE
 
 // Global Variables
 const mapContainerId = "map"; // ID of the map div
-const defaultLocation = [2.154007, 41.390205]; // Default location (Paris coordinates)
+const defaultLocation = [2.154007, 41.390205]; // Default location (Barcelona coordinates)
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
 let map; // Declare map variable globally so it can be accessed by other functions
 
 // Ensure the DOM is fully loaded before running the script
 document.addEventListener("DOMContentLoaded", function () {
-  initializeMap(); // Call the function to initialize the map
-  locateUser(); // Call the function to locate the user
-  setupSearch(); // Call the function to setup the search functionality
+  initializeMap(); // Initialize the map
+  locateUser(); // Locate the user
+  setupSearch(); // Set up search functionality
   setupGeolocation(); // Set up geolocation functionality
 });
 
@@ -24,12 +24,14 @@ function initializeMap() {
     console.error("Mapbox GL JS is not loaded.");
     return;
   }
+
   // Set the Mapbox access token
   mapboxgl.accessToken = mapboxToken;
+
   // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/outdoors-v12",
+    style: "mapbox://styles/mapbox/outdoors-v12", // Map style
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
@@ -49,7 +51,7 @@ function locateUser() {
           zoom: 12, // Adjust zoom level as needed
         });
 
-        // Optionally, add a marker at the user's location
+        // Add a marker at the user's location
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
 
         // Fetch climb data around the user's location
@@ -69,8 +71,8 @@ function locateUser() {
 
 // Function to set up search functionality
 function setupSearch() {
-  // Added this part to prevent form submission
-  const form = document.querySelector("form"); // Select the form element
+  // Prevent form submission
+  const form = document.querySelector("form");
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault(); // Prevent form submission
@@ -133,7 +135,6 @@ function setupGeolocation() {
   const geolocateButton = document.getElementById("geolocateButton");
 
   geolocateButton.addEventListener("click", function (event) {
-    // Notice the event parameter
     event.preventDefault(); // Prevent any default behavior, such as form submission
 
     if ("geolocation" in navigator) {
@@ -148,11 +149,11 @@ function setupGeolocation() {
             zoom: 12, // Adjust zoom level as needed
           });
 
-          // Optionally, add a marker at the user's location
+          // Add a marker at the user's location
           new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
         },
         function (error) {
-          console.error("Error getting geolocation: ", error);
+          console.error("Error getting geolocation:", error);
           alert("Unable to retrieve your location.");
         }
       );
@@ -187,89 +188,64 @@ function calculateClimbCategory(length, gradient) {
   return null; // Default case, though it should not be reached
 }
 
-// const category = calculateClimbCategory(climb1.length, climb1.gradient);
-// console.log(`${climb1.name} is classified as: ${category}`);
-
-///////////////////// Finding the climbs ///////////////////////
-
+// Function to fetch climb data using Mapbox API
 function fetchClimbData(location, radius = 50) {
-  const bbox = getBoundingBox(location, radius);
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
     radius * 1000
-  }&limit=50&access_token=${mapboxToken}`;
+  }&limit=500&access_token=${mapboxToken}`;
 
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
+      console.log("Raw data received:", data);
       const elevationPoints = data.features.map((feature) => ({
         coordinates: feature.geometry.coordinates,
         elevation: feature.properties.ele,
       }));
-      findClimbs(elevationPoints);
+      const climbs = findClimbs(elevationPoints);
+      displayClimbs(climbs);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-function getBoundingBox(location, radiusKm) {
-  const earthRadius = 6371; // km
-  const lat = (location[1] * Math.PI) / 180;
-  const lon = (location[0] * Math.PI) / 180;
-  const dLat = radiusKm / earthRadius;
-  const dLon = Math.asin(Math.sin(dLat) / Math.cos(lat));
+// Function to find climbs based on elevation points
+function findClimbs(elevationPoints) {
+  console.log("Elevation points received:", elevationPoints.length);
+  const climbs = [];
+  let currentClimb = [];
+  let totalElevationGain = 0;
 
-  return [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(
-    (rad) => (rad * 180) / Math.PI
-  );
-}
-
-// Function to display climbs on the map
-function displayClimbs(climbs) {
-  if (!map.loaded()) {
-    map.on("load", () => displayClimbs(climbs));
-    return;
+  for (let i = 1; i < elevationPoints.length; i++) {
+    const elevationDiff =
+      elevationPoints[i].elevation - elevationPoints[i - 1].elevation;
+    if (elevationDiff > 0) {
+      currentClimb.push(elevationPoints[i]);
+      totalElevationGain += elevationDiff;
+    } else if (currentClimb.length > 0) {
+      console.log(
+        `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
+      );
+      if (totalElevationGain > 20 && currentClimb.length > 2) {
+        // Lowered criteria
+        climbs.push({
+          name: `Climb ${climbs.length + 1}`,
+          coordinates: currentClimb.map((point) => point.coordinates),
+          elevationGain: totalElevationGain,
+          length: calculateDistance(currentClimb),
+          category: calculateClimbCategory(
+            calculateDistance(currentClimb),
+            totalElevationGain
+          ),
+        });
+        console.log("Climb added");
+      }
+      currentClimb = [];
+      totalElevationGain = 0;
+    }
   }
 
-  console.log("Displaying climbs:", climbs);
-
-  climbs.forEach((climb, index) => {
-    console.log(`Adding route for climb: ${climb.name}`);
-
-    map.addSource(`route-source-${index}`, {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: climb.coordinates,
-        },
-      },
-    });
-
-    map.addLayer({
-      id: `route-${index}`,
-      type: "line",
-      source: `route-source-${index}`,
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#FF5733",
-        "line-width": 4,
-      },
-    });
-
-    // Add a marker for the start of the climb
-    new mapboxgl.Marker()
-      .setLngLat(climb.coordinates[0])
-      .setPopup(
-        new mapboxgl.Popup().setHTML(
-          `<h3>${climb.name}</h3><p>Category: ${climb.category}</p>`
-        )
-      )
-      .addTo(map);
-  });
+  console.log(`Total climbs found: ${climbs.length}`);
+  return climbs;
 }
