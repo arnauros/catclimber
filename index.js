@@ -166,7 +166,7 @@ function setupGeolocation() {
 }
 
 // Function to fetch climb data using the Mapbox API
-function fetchClimbData(location, radius = 50) {
+function fetchClimbData(location, radius = 500) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
