@@ -11,10 +11,12 @@ let map; // Declare map variable globally so it can be accessed by other functio
 
 // Ensure the DOM is fully loaded before running the script
 document.addEventListener("DOMContentLoaded", function () {
-  initializeMap(); // Initialize the map
-  locateUser(); // Locate the user
-  setupSearch(); // Set up search functionality
-  setupGeolocation(); // Set up geolocation functionality
+  initializeMap(); // Call the function to initialize the map
+  map.on("load", () => {
+    locateUser(); // Call the function to locate the user after map is loaded
+    setupSearch(); // Call the function to setup the search functionality
+    setupGeolocation(); // Set up geolocation functionality
+  });
 });
 
 // Function to initialize the map
