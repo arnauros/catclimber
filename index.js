@@ -151,6 +151,15 @@ function initializeMap() {
 
 // Function to set up search functionality
 function setupSearch() {
+  // Added this part to prevent form submission
+  const form = document.querySelector("form"); // Select the form element
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent form submission
+    });
+  }
+  // End of added part
+
   // Set up the search button click event
   document
     .getElementById("searchButton")
