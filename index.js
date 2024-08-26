@@ -144,7 +144,6 @@ function initializeMap() {
   // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/streets-v11", // Style of the map
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
@@ -155,7 +154,8 @@ function setupSearch() {
   // Set up the search button click event
   document
     .getElementById("searchButton")
-    .addEventListener("click", function () {
+    .addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission behavior
       const query = document.getElementById("searchLocate").value;
       if (query) {
         searchLocation(query);
@@ -169,6 +169,7 @@ function setupSearch() {
     .getElementById("searchLocate")
     .addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
+        e.preventDefault(); // Prevent the default form submission behavior
         const query = e.target.value;
         if (query) {
           searchLocation(query);
