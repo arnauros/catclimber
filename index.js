@@ -205,3 +205,44 @@ function fetchClimbData(location, radius = 50) {
     })
     .catch((error) => console.error("Error fetching climb data:", error));
 }
+
+function displayClimbs(climbs) {
+  climbs.forEach((climb) => {
+    if (climb.category) {
+      // Add a marker at the start of the route
+      new mapboxgl.Marker()
+        .setLngLat(climb.coordinates[0]) // Start of the route
+        .setPopup(
+          new mapboxgl.Popup().setText(`${climb.name} - ${climb.category}`)
+        )
+        .addTo(map);
+
+      // Plot the route on the map
+      const routeGeoJSON = {
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: climb.coordinates, // The entire array of coordinates
+        },
+      };
+
+      // Add the route as a layer to the map
+      map.addLayer({
+        id: `route-${climb.name}`, // Unique ID for each route
+        type: "line",
+        source: {
+          type: "geojson",
+          data: routeGeoJSON,
+        },
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#FF5733", // Customize the color
+          "line-width": 4, // Customize the line width
+        },
+      });
+    }
+  });
+}
