@@ -251,7 +251,11 @@ function calculateDistance(points) {
 
 function displayClimbs(climbs) {
   if (!map.loaded()) {
-    map.on("load", () => displayClimbs(climbs));
+    map.on("load", () => {
+      // Use the map center as the location to fetch climbs
+      const center = map.getCenter();
+      fetchClimbData([center.lng, center.lat]);
+    });
     return;
   }
 
