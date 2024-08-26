@@ -115,11 +115,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ////////////////////////////////////////
 
-/*
-
 //Mapbox PROJECT STARTS HERE
 
-// Global Variables
 // Global Variables
 const mapContainerId = "map"; // ID of the div where the map will be rendered
 const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
@@ -149,11 +146,4 @@ function initializeMap() {
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
-
-  // Optional: Add navigation controls to the map (zoom, rotate)
-  map.addControl(new mapboxgl.NavigationControl());
-
-  // Optional: Add other map setup or event listeners here
 }
-
-*/
