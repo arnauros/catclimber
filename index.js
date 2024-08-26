@@ -334,6 +334,8 @@ function visualizeClimbs(climbs) {
   });
 }
 
+visualizeClimbs(climbs);
+
 // Function to initialize the map
 function initializeMap() {
   if (typeof mapboxgl === "undefined") {
