@@ -115,6 +115,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ////////////////////////////////////////
 
+
+/*
+
 //Mapbox PROJECT STARTS HERE
 
 // Global Variables
