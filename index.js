@@ -187,8 +187,8 @@ function calculateClimbCategory(length, gradient) {
   return null; // Default case, though it should not be reached
 }
 
-const category = calculateClimbCategory(climb1.length, climb1.gradient);
-console.log(`${climb1.name} is classified as: ${category}`);
+// const category = calculateClimbCategory(climb1.length, climb1.gradient);
+// console.log(`${climb1.name} is classified as: ${category}`);
 
 ///////////////////// Finding the climbs ///////////////////////
 
