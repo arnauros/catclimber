@@ -174,6 +174,9 @@ function fetchClimbData(location, radius = 20000) {
     radius * 1000
   }&limit=50&access_token=${mapboxToken}`;
 
+  // Draw the search area on the map as a circle
+  drawSearchArea(location, radius);
+
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
@@ -195,6 +198,47 @@ function fetchClimbData(location, radius = 20000) {
       visualizeClimbs(climbs);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
+}
+
+// Function to draw the search area on the map
+function drawSearchArea(location, radius) {
+  // Check if the map is loaded
+  if (!map.loaded()) {
+    map.on("load", () => drawSearchArea(location, radius));
+    return;
+  }
+
+  // Add a source for the search area circle
+  map.addSource("search-area", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: location,
+      },
+    },
+  });
+
+  // Add a layer to visualize the search area as a circle
+  map.addLayer({
+    id: "search-area-layer",
+    type: "circle",
+    source: "search-area",
+    paint: {
+      "circle-radius": {
+        base: 2,
+        stops: [
+          [0, 0],
+          [20, radius / 500], // Adjust circle size based on zoom level and radius
+        ],
+      },
+      "circle-color": "#FF5733",
+      "circle-opacity": 0.3,
+    },
+  });
+
+  console.log("Search area drawn on the map.");
 }
 
 // Function to find potential climbs based on elevation points
