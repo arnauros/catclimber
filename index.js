@@ -163,38 +163,13 @@ function setupGeolocation() {
   });
 }
 
-// Function to calculate the climb category based on length and gradient
-function calculateClimbCategory(length, gradient) {
-  const score = length * gradient;
-
-  // Ensure the climb meets the minimum criteria
-  if (gradient < 3 || score < 8000) {
-    return null; // Not categorized
-  }
-
-  // Categorize based on the score
-  if (score >= 80000) {
-    return "Hors Catégorie";
-  } else if (score >= 64000) {
-    return "Category 1";
-  } else if (score >= 32000) {
-    return "Category 2";
-  } else if (score >= 16000) {
-    return "Category 3";
-  } else if (score >= 8000) {
-    return "Category 4";
-  }
-
-  return null; // Default case, though it should not be reached
-}
-
 // Function to fetch climb data using the Mapbox API
 function fetchClimbData(location, radius = 50) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
     radius * 1000
-  }&limit=500&access_token=${mapboxToken}`;
+  }&limit=50&access_token=${mapboxToken}`;
 
   fetch(url)
     .then((response) => response.json())
