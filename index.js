@@ -360,6 +360,7 @@ function initializeMap() {
 /////////////////////// test line /////////////////////////////////
 // TEST CODE FOR THE LINE
 // Function to add a test line on the map
+// /*
 function addTestLine() {
   console.log("line added");
   const testLineCoordinates = [
@@ -396,5 +397,5 @@ function addTestLine() {
 
   console.log("Test line added to the map.");
 }
-*/
+// */
 // Function to fetch the route using Mapbox Directions API and plot it on the map
