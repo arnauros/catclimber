@@ -12,6 +12,7 @@ let map; // Declare map variable globally so it can be accessed by other functio
 // Ensure the DOM is fully loaded before running the script
 document.addEventListener("DOMContentLoaded", function () {
   initializeMap(); // Call the function to initialize the map
+  locateUser(); // Call the function to locate the user
   setupSearch(); // Call the function to setup the search functionality
   setupGeolocation(); // Set up geolocation functionality
 });
@@ -23,10 +24,8 @@ function initializeMap() {
     console.error("Mapbox GL JS is not loaded.");
     return;
   }
-
   // Set the Mapbox access token
   mapboxgl.accessToken = mapboxToken;
-
   // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
@@ -34,6 +33,33 @@ function initializeMap() {
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
+}
+
+// Function to automatically locate the user on page load
+function locateUser() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const userCoordinates = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
+        map.flyTo({
+          center: userCoordinates,
+          zoom: 12, // Adjust zoom level as needed
+        });
+
+        // Optionally, add a marker at the user's location
+        new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+      },
+      function (error) {
+        console.error("Error getting geolocation: ", error);
+        // Optionally, you can alert the user or handle the error by keeping the map at the default location
+      }
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+  }
 }
 
 // Function to set up search functionality
