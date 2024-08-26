@@ -174,13 +174,17 @@ function fetchClimbData(location, radius = 50) {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
+      if (data.message) {
+        console.error("Error in API response:", data.message);
+        return;
+      }
       console.log("Raw data received:", data);
       const elevationPoints = data.features.map((feature) => ({
         coordinates: feature.geometry.coordinates,
         elevation: feature.properties.ele,
       }));
       const climbs = findClimbs(elevationPoints);
-      console.log("Climbs found:", climbs); // Logging climbs found to check the data
+      console.log("Climbs found:", climbs);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
