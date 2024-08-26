@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     locateUser(); // Call the function to locate the user after map is loaded
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
+    addTestLine(); // Add a test line to the map
   });
 });
 
@@ -336,16 +337,31 @@ function visualizeClimbs(climbs) {
 // Wait until the map is fully loaded before adding the line
 // Wait until the map is fully loaded before adding the line
 // Wait until the map is fully loaded before adding the line
-map.on("load", () => {
-  // Define the coordinates for the test line (reversed format)
-  console.log("test works");
+// Function to initialize the map
+function initializeMap() {
+  if (typeof mapboxgl === "undefined") {
+    console.error("Mapbox GL JS is not loaded.");
+    return;
+  }
+
+  mapboxgl.accessToken = mapboxToken;
+
+  map = new mapboxgl.Map({
+    container: mapContainerId,
+    style: "mapbox://styles/mapbox/outdoors-v12",
+    center: defaultLocation,
+    zoom: 10,
+  });
+}
+
+// Function to add a test line on the map
+function addTestLine() {
   const testLineCoordinates = [
-    [41.85876, 3.10093], // Reversed: latitude, longitude
-    [41.85855, 3.10017], // Reversed: latitude, longitude
-    [41.9, 3.2], // Reversed: latitude, longitude
+    [3.10093, 41.85876], // Starting point
+    [3.10017, 41.85855], // Another point
+    [3.2, 41.9], // Another random point
   ];
 
-  // Add a new source for your test line data
   map.addSource("test-line-source", {
     type: "geojson",
     data: {
@@ -358,7 +374,6 @@ map.on("load", () => {
     },
   });
 
-  // Add a new layer to visualize the test line
   map.addLayer({
     id: "test-line-layer",
     type: "line",
@@ -368,10 +383,10 @@ map.on("load", () => {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#00FF00", // Green color for the line
+      "line-color": "#FF0000", // Red color for the line
       "line-width": 5, // Line width in pixels
     },
   });
 
-  console.log("Test line with reversed coordinates added to the map.");
-});
+  console.log("Test line added to the map.");
+}
