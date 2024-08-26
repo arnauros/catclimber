@@ -4,9 +4,9 @@
 
 // Global Variables
 const mapContainerId = "map"; // ID of the map div
-const defaultLocation = [2.154007, 41.390205]; // Default location (Barcelona coordinates)
+const defaultLocation = [2.154007, 41.390205]; // Default location (BCN)
 const mapboxToken =
-  "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
+  "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ";
 let map; // Declare map variable globally so it can be accessed by other functions
 
 // Ensure the DOM is fully loaded before running the script
