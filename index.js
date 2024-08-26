@@ -356,6 +356,7 @@ function initializeMap() {
 
 // Function to add a test line on the map
 function addTestLine() {
+  console.log("line added");
   const testLineCoordinates = [
     [3.10093, 41.85876], // Starting point
     [3.10017, 41.85855], // Another point
