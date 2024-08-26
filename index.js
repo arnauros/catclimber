@@ -4,7 +4,7 @@
 
 // Global Variables
 const mapContainerId = "map"; // ID of the map div
-const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
+const defaultLocation = [41.3874, 2.1686]; // Default location (Paris coordinates)
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
 let map; // Declare map variable globally so it can be accessed by other functions
