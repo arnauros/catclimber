@@ -215,7 +215,7 @@ function findClimbs(elevationPoints) {
         `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
       );
       // Adjust the minimum criteria for elevation gain and length
-      if (totalElevationGain > 100 && currentClimb.length > 5) {
+      if (totalElevationGain > 150 && currentClimb.length > 10) {
         // Increase elevation gain threshold to 100m and length to 5 points
         climbs.push({
           name: `Climb ${climbs.length + 1}`,
