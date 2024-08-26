@@ -1,5 +1,6 @@
 "use strict";
 
+/*
 // Define constants for the base URL and the authorization token
 const STRAVA_BASE_URL = "https://www.strava.com/api/v3/segments/";
 const STRAVA_ACCESS_TOKEN = "Bearer f23239241d3c6a20b980bc1fb326235164b0b2f1";
@@ -109,3 +110,35 @@ document.addEventListener("DOMContentLoaded", function () {
   const initialSegmentId = "5126312"; // Example segment ID
   displaySegmentData(initialSegmentId);
 });
+
+*/
+
+////////////////////////////////////////
+
+//Mapbox PROJECT STARTS HERE
+
+// Global Variables
+const mapContainerId = "map"; // ID of the div where the map will be rendered
+const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
+const mapboxToken =
+  "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
+
+// Initialize the map
+function initializeMap() {
+  mapboxgl.accessToken = mapboxToken;
+
+  const map = new mapboxgl.Map({
+    container: mapContainerId,
+    style: "mapbox://styles/mapbox/streets-v11", // Style of the map
+    center: defaultLocation, // Default center location
+    zoom: 10, // Default zoom level
+  });
+
+  // Optional: Add navigation controls to the map (zoom, rotate)
+  map.addControl(new mapboxgl.NavigationControl());
+
+  // Optional: Handle any additional map setup here
+}
+
+// Call the function to initialize the map
+initializeMap();
