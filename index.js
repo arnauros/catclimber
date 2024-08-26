@@ -200,45 +200,63 @@ function fetchClimbData(location, radius = 5000) {
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-// Function to draw the search area on the map
 function drawSearchArea(location, radius) {
-  // Check if the map is loaded
-  if (!map.loaded()) {
-    map.on("load", () => drawSearchArea(location, radius));
-    return;
+  const circle = createCircle(location, radius);
+
+  // Remove existing search area layer and source if they exist
+  if (map.getLayer("search-area-layer")) {
+    map.removeLayer("search-area-layer");
+  }
+  if (map.getSource("search-area")) {
+    map.removeSource("search-area");
   }
 
-  // Add a source for the search area circle
+  // Add the circle as a Polygon
   map.addSource("search-area", {
     type: "geojson",
     data: {
       type: "Feature",
       geometry: {
-        type: "Point",
-        coordinates: location,
+        type: "Polygon",
+        coordinates: [circle],
       },
     },
   });
 
-  // Add a layer to visualize the search area as a circle
   map.addLayer({
     id: "search-area-layer",
-    type: "circle",
+    type: "fill",
     source: "search-area",
     paint: {
-      "circle-radius": {
-        base: 2,
-        stops: [
-          [0, 0],
-          [20, radius / 500], // Adjust circle size based on zoom level and radius
-        ],
-      },
-      "circle-color": "#FF5733",
-      "circle-opacity": 0.3,
+      "fill-color": "#FF5733",
+      "fill-opacity": 0.3,
     },
   });
+}
 
-  console.log("Search area drawn on the map.");
+// Function to create a circle (polygon) around a given point
+function createCircle(center, radiusInKm, points = 64) {
+  const coords = {
+    latitude: center[1],
+    longitude: center[0],
+  };
+  const km = radiusInKm;
+
+  const ret = [];
+  const distanceX = km / (111.32 * Math.cos((coords.latitude * Math.PI) / 180));
+  const distanceY = km / 110.574;
+
+  let theta, x, y;
+  for (let i = 0; i < points; i++) {
+    theta = (i / points) * (2 * Math.PI);
+    x = distanceX * Math.cos(theta);
+    y = distanceY * Math.sin(theta);
+
+    ret.push([coords.longitude + x, coords.latitude + y]);
+  }
+  ret.push(ret[0]);
+
+  return ret;
 }
 
 // Function to find potential climbs based on elevation points
