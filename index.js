@@ -277,6 +277,9 @@ function visualizeClimbs(climbs) {
   }
 
   climbs.forEach((climb, index) => {
+    // Logging the coordinates of each climb
+    console.log(`Visualizing Climb ${index + 1}:`, climb.coordinates);
+
     // Add a source for the climb route
     map.addSource(`climb-source-${index}`, {
       type: "geojson",
@@ -306,5 +309,17 @@ function visualizeClimbs(climbs) {
     });
 
     // Add a marker at the start of the climb
+    new mapboxgl.Marker()
+      .setLngLat(climb.coordinates[0])
+      .setPopup(
+        new mapboxgl.Popup({ offset: 25 }).setHTML(
+          `<h3>${climb.name}</h3><p>Category: ${
+            climb.category
+          }</p><p>Length: ${climb.length.toFixed(
+            2
+          )} m</p><p>Elevation Gain: ${climb.elevationGain.toFixed(0)} m</p>`
+        )
+      )
+      .addTo(map);
   });
 }
