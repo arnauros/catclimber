@@ -188,6 +188,9 @@ function fetchClimbData(location, radius = 500) {
       }));
       const climbs = findClimbs(elevationPoints);
       console.log("Climbs found:", climbs);
+
+      // Visualize the climbs on the map
+      visualizeClimbs(climbs);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
@@ -333,8 +336,6 @@ function visualizeClimbs(climbs) {
     console.log(`Added marker for climb ${index}`);
   });
 }
-
-visualizeClimbs(climbs);
 
 // Function to initialize the map
 function initializeMap() {
