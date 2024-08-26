@@ -193,38 +193,70 @@ function calculateClimbCategory(length, gradient) {
 ///////////////////// Finding the climbs ///////////////////////
 
 function fetchClimbData(location, radius = 50) {
-  const bbox = getBoundingBox(location, radius);
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
     radius * 1000
-  }&limit=50&access_token=${mapboxToken}`;
+  }&limit=500&access_token=${mapboxToken}`;
 
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
+      console.log("Raw data received:", data);
       const elevationPoints = data.features.map((feature) => ({
         coordinates: feature.geometry.coordinates,
         elevation: feature.properties.ele,
       }));
-      findClimbs(elevationPoints);
+      const climbs = findClimbs(elevationPoints);
+      displayClimbs(climbs);
     })
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-function getBoundingBox(location, radiusKm) {
-  const earthRadius = 6371; // km
-  const lat = (location[1] * Math.PI) / 180;
-  const lon = (location[0] * Math.PI) / 180;
-  const dLat = radiusKm / earthRadius;
-  const dLon = Math.asin(Math.sin(dLat) / Math.cos(lat));
+function findClimbs(elevationPoints) {
+  console.log("Elevation points received:", elevationPoints.length);
+  const climbs = [];
+  let currentClimb = [];
+  let totalElevationGain = 0;
 
-  return [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(
-    (rad) => (rad * 180) / Math.PI
-  );
+  for (let i = 1; i < elevationPoints.length; i++) {
+    const elevationDiff =
+      elevationPoints[i].elevation - elevationPoints[i - 1].elevation;
+    if (elevationDiff > 0) {
+      currentClimb.push(elevationPoints[i]);
+      totalElevationGain += elevationDiff;
+    } else if (currentClimb.length > 0) {
+      console.log(
+        `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
+      );
+      if (totalElevationGain > 20 && currentClimb.length > 2) {
+        // Lowered criteria
+        climbs.push({
+          coordinates: currentClimb.map((point) => point.coordinates),
+          elevationGain: totalElevationGain,
+          length: calculateDistance(currentClimb),
+        });
+        console.log("Climb added");
+      }
+      currentClimb = [];
+      totalElevationGain = 0;
+    }
+  }
+
+  console.log(`Total climbs found: ${climbs.length}`);
+  return climbs; // Ensure this return statement is within the function
 }
 
-// Function to display climbs on the map
+function calculateDistance(points) {
+  let distance = 0;
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].coordinates[0] - points[i - 1].coordinates[0];
+    const dy = points[i].coordinates[1] - points[i - 1].coordinates[1];
+    distance += Math.sqrt(dx * dx + dy * dy);
+  }
+  return distance * 111000; // Rough conversion to meters
+}
+
 function displayClimbs(climbs) {
   if (!map.loaded()) {
     map.on("load", () => displayClimbs(climbs));
@@ -234,9 +266,9 @@ function displayClimbs(climbs) {
   console.log("Displaying climbs:", climbs);
 
   climbs.forEach((climb, index) => {
-    console.log(`Adding route for climb: ${climb.name}`);
+    const climbCategory = categorizeClimb(climb.length, climb.elevationGain);
 
-    map.addSource(`route-source-${index}`, {
+    map.addSource(`climb-source-${index}`, {
       type: "geojson",
       data: {
         type: "Feature",
@@ -249,27 +281,62 @@ function displayClimbs(climbs) {
     });
 
     map.addLayer({
-      id: `route-${index}`,
+      id: `climb-${index}`,
       type: "line",
-      source: `route-source-${index}`,
+      source: `climb-source-${index}`,
       layout: {
         "line-join": "round",
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#FF5733",
+        "line-color": getClimbColor(climbCategory),
         "line-width": 4,
       },
     });
 
-    // Add a marker for the start of the climb
     new mapboxgl.Marker()
       .setLngLat(climb.coordinates[0])
       .setPopup(
         new mapboxgl.Popup().setHTML(
-          `<h3>${climb.name}</h3><p>Category: ${climb.category}</p>`
+          `<h3>Climb ${
+            index + 1
+          }</h3><p>Category: ${climbCategory}</p><p>Length: ${(
+            climb.length / 1000
+          ).toFixed(2)} km</p><p>Elevation Gain: ${climb.elevationGain.toFixed(
+            0
+          )} m</p>`
         )
       )
       .addTo(map);
   });
 }
+
+function categorizeClimb(length, elevationGain) {
+  const gradient = (elevationGain / length) * 100;
+  if (gradient > 10) return "HC";
+  if (gradient > 8) return "1";
+  if (gradient > 6) return "2";
+  if (gradient > 4) return "3";
+  return "4";
+}
+
+function getClimbColor(category) {
+  switch (category) {
+    case "HC":
+      return "#FF0000";
+    case "1":
+      return "#FF6600";
+    case "2":
+      return "#FFCC00";
+    case "3":
+      return "#66CC00";
+    default:
+      return "#0099CC";
+  }
+}
+
+map.on("load", () => {
+  const center = map.getCenter();
+  console.log("Fetching climbs for:", center);
+  fetchClimbData([center.lng, center.lat]);
+});
