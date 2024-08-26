@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const mapContainerId = "map"; // ID of the map div
 const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
 const mapboxToken =
-  "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
+  "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNibHg0MDB1cDJxcW1pMG5wazNsNiJ9.s-gJgvHdRWGjLDFfZtPFdw"; // Your Mapbox access token
 
 // Ensure the DOM is fully loaded before running the script
 document.addEventListener("DOMContentLoaded", function () {
