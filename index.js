@@ -332,3 +332,42 @@ function visualizeClimbs(climbs) {
     console.log(`Added marker for climb ${index}`);
   });
 }
+
+// Wait until the map is fully loaded before adding the line
+map.on("load", function () {
+  // Define the coordinates for the line
+  const lineCoordinates = [
+    [2.154007, 41.390205], // Starting point (Barcelona)
+    [2.175022, 41.385064], // Another point in Barcelona
+  ];
+
+  // Add a new source for the line
+  map.addSource("test-line-source", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: lineCoordinates,
+      },
+    },
+  });
+
+  // Add a new layer to visualize the line
+  map.addLayer({
+    id: "test-line-layer",
+    type: "line",
+    source: "test-line-source",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "#FF0000", // Red color for the line
+      "line-width": 5, // Line width in pixels
+    },
+  });
+
+  console.log("Test line added to the map.");
+});
