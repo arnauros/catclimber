@@ -334,9 +334,6 @@ function visualizeClimbs(climbs) {
   });
 }
 
-// Wait until the map is fully loaded before adding the line
-// Wait until the map is fully loaded before adding the line
-// Wait until the map is fully loaded before adding the line
 // Function to initialize the map
 function initializeMap() {
   if (typeof mapboxgl === "undefined") {
@@ -353,6 +350,8 @@ function initializeMap() {
     zoom: 10,
   });
 }
+
+/////////////////////// test line /////////////////////////////////
 
 // Function to add a test line on the map
 function addTestLine() {
