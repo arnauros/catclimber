@@ -51,14 +51,19 @@ function locateUser() {
 
         // Optionally, add a marker at the user's location
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+
+        // Fetch climb data around the user's location
+        fetchClimbData(userCoordinates);
       },
       function (error) {
-        console.error("Error getting geolocation: ", error);
-        // Optionally, you can alert the user or handle the error by keeping the map at the default location
+        console.error("Error getting geolocation:", error);
+        // Fallback to default location (Barcelona) if geolocation fails
+        fetchClimbData(defaultLocation);
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
+    fetchClimbData(defaultLocation); // Fallback to Barcelona if geolocation isn't available
   }
 }
 
@@ -155,4 +160,48 @@ function setupGeolocation() {
       alert("Geolocation is not supported by your browser.");
     }
   });
+}
+
+// Function to calculate the climb category based on length and gradient
+function calculateClimbCategory(length, gradient) {
+  const score = length * gradient;
+
+  // Ensure the climb meets the minimum criteria
+  if (gradient < 3 || score < 8000) {
+    return null; // Not categorized
+  }
+
+  // Categorize based on the score
+  if (score >= 80000) {
+    return "Hors Catégorie";
+  } else if (score >= 64000) {
+    return "Category 1";
+  } else if (score >= 32000) {
+    return "Category 2";
+  } else if (score >= 16000) {
+    return "Category 3";
+  } else if (score >= 8000) {
+    return "Category 4";
+  }
+
+  return null; // Default case, though it should not be reached
+}
+
+const category = calculateClimbCategory(climb1.length, climb1.gradient);
+console.log(`${climb1.name} is classified as: ${category}`);
+
+///////////////////// Finding the climbs ///////////////////////
+
+function fetchClimbData(location, radius = 50) {
+  const destination = [location[0] + 0.1, location[1] + 0.1]; // Adjust the destination point slightly for simplicity
+  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${location[0]},${location[1]};${destination[0]},${destination[1]}?geometries=geojson&access_token=${mapboxToken}`;
+
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Climb data fetched:", data);
+      // Here we would process the data to extract relevant information
+      // For now, just log the data to understand its structure
+    })
+    .catch((error) => console.error("Error fetching climb data:", error));
 }
