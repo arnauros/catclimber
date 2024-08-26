@@ -118,17 +118,31 @@ document.addEventListener("DOMContentLoaded", function () {
 //Mapbox PROJECT STARTS HERE
 
 // Global Variables
+// Global Variables
 const mapContainerId = "map"; // ID of the div where the map will be rendered
 const defaultLocation = [2.3522, 48.8566]; // Default location (Paris coordinates)
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ"; // Your Mapbox access token
 
-// Initialize the map
+// Ensure the DOM is fully loaded before running the script
+document.addEventListener("DOMContentLoaded", function () {
+  initializeMap(); // Call the function to initialize the map
+});
+
+// Function to initialize the map
 function initializeMap() {
+  // Ensure the Mapbox GL JS library is loaded
+  if (typeof mapboxgl === "undefined") {
+    console.error("Mapbox GL JS is not loaded.");
+    return;
+  }
+
+  // Set the Mapbox access token
   mapboxgl.accessToken = mapboxToken;
 
+  // Initialize the map
   const map = new mapboxgl.Map({
-    container: mapContainerId,
+    container: mapContainerId, // ID of the map container
     style: "mapbox://styles/mapbox/streets-v11", // Style of the map
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
@@ -137,8 +151,5 @@ function initializeMap() {
   // Optional: Add navigation controls to the map (zoom, rotate)
   map.addControl(new mapboxgl.NavigationControl());
 
-  // Optional: Handle any additional map setup here
+  // Optional: Add other map setup or event listeners here
 }
-
-// Call the function to initialize the map
-initializeMap();
