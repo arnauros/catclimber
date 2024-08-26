@@ -335,12 +335,14 @@ function visualizeClimbs(climbs) {
 
 // Wait until the map is fully loaded before adding the line
 // Wait until the map is fully loaded before adding the line
+// Wait until the map is fully loaded before adding the line
 map.on("load", () => {
-  // Define the coordinates for the test line
+  // Define the coordinates for the test line (reversed format)
+  console.log("test works");
   const testLineCoordinates = [
-    [3.10093, 41.85876], // Starting point
-    [3.10017, 41.85855], // Ending point
-    [3.2, 41.9], // Another random point
+    [41.85876, 3.10093], // Reversed: latitude, longitude
+    [41.85855, 3.10017], // Reversed: latitude, longitude
+    [41.9, 3.2], // Reversed: latitude, longitude
   ];
 
   // Add a new source for your test line data
@@ -366,10 +368,10 @@ map.on("load", () => {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000", // Red color for the line
+      "line-color": "#00FF00", // Green color for the line
       "line-width": 5, // Line width in pixels
     },
   });
 
-  console.log("Test line added to the map.");
+  console.log("Test line with reversed coordinates added to the map.");
 });
