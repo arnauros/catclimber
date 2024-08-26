@@ -200,64 +200,76 @@ function fetchClimbData(location, radius = 5000) {
     .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
-function drawSearchArea(location, radius) {
-  const circle = createCircle(location, radius);
+//circle draw area
+function drawSearchArea(location, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
+  const searchAreaLayerId = "search-area-layer";
+
+  // Convert radius from meters to kilometers for the circle creation
+  const radiusInKm = radiusInMeters / 1000;
 
   // Remove existing search area layer and source if they exist
-  if (map.getLayer("search-area-layer")) {
-    map.removeLayer("search-area-layer");
-  }
-  if (map.getSource("search-area")) {
-    map.removeSource("search-area");
-  }
+  removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
 
-  // Add the circle as a Polygon
-  map.addSource("search-area", {
+  // Create the circular polygon and add it to the map
+  const circlePolygon = createCirclePolygon(location, radiusInKm);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId, searchAreaLayerId);
+}
+
+// Function to remove existing search area layer and source from the map
+function removeExistingSearchArea(sourceId, layerId) {
+  if (map.getLayer(layerId)) {
+    map.removeLayer(layerId);
+  }
+  if (map.getSource(sourceId)) {
+    map.removeSource(sourceId);
+  }
+}
+
+// Function to create a circular polygon around a given point
+function createCirclePolygon(center, radiusInKm, points = 64) {
+  const latitude = center[1];
+  const longitude = center[0];
+  const coordinates = [];
+
+  const distanceX =
+    radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  const distanceY = radiusInKm / 110.574;
+
+  for (let i = 0; i < points; i++) {
+    const theta = (i / points) * (2 * Math.PI);
+    const x = distanceX * Math.cos(theta);
+    const y = distanceY * Math.sin(theta);
+    coordinates.push([longitude + x, latitude + y]);
+  }
+  coordinates.push(coordinates[0]); // Close the polygon
+
+  return coordinates;
+}
+
+// Function to add the search area polygon to the map
+function addSearchAreaToMap(coordinates, sourceId, layerId) {
+  map.addSource(sourceId, {
     type: "geojson",
     data: {
       type: "Feature",
       geometry: {
         type: "Polygon",
-        coordinates: [circle],
+        coordinates: [coordinates],
       },
     },
   });
 
   map.addLayer({
-    id: "search-area-layer",
+    id: layerId,
     type: "fill",
-    source: "search-area",
+    source: sourceId,
     paint: {
       "fill-color": "#FF5733",
       "fill-opacity": 0.3,
     },
   });
 }
-
-// // Function to create a circle (polygon) around a given point
-// function createCircle(center, radiusInKm, points = 64) {
-//   const coords = {
-//     latitude: center[1],
-//     longitude: center[0],
-//   };
-//   const km = radiusInKm;
-
-//   const ret = [];
-//   const distanceX = km / (111.32 * Math.cos((coords.latitude * Math.PI) / 180));
-//   const distanceY = km / 110.574;
-
-//   let theta, x, y;
-//   for (let i = 0; i < points; i++) {
-//     theta = (i / points) * (2 * Math.PI);
-//     x = distanceX * Math.cos(theta);
-//     y = distanceY * Math.sin(theta);
-
-//     ret.push([coords.longitude + x, coords.latitude + y]);
-//   }
-//   ret.push(ret[0]);
-
-//   return ret;
-// }
 
 // Function to find potential climbs based on elevation points
 function findClimbs(elevationPoints) {
