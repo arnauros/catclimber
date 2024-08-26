@@ -358,7 +358,7 @@ function initializeMap() {
 }
 
 /////////////////////// test line /////////////////////////////////
-/* TEST CODE FOR THE LINE
+// TEST CODE FOR THE LINE
 // Function to add a test line on the map
 function addTestLine() {
   console.log("line added");
