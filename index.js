@@ -206,65 +206,52 @@ function fetchClimbData(location, radius = 50) {
     .catch((error) => console.error("Error fetching climb data:", error));
 }
 
+// Function to display climbs on the map
 function displayClimbs(climbs) {
-  map.on("load", function () {
-    // Ensure the map is fully loaded
-    console.log("Map loaded, ready to add climbs.");
+  if (!map.loaded()) {
+    map.on("load", () => displayClimbs(climbs));
+    return;
+  }
 
-    const layers = map.getStyle().layers;
-    let firstSymbolId;
-    for (const layer of layers) {
-      if (layer.type === "symbol") {
-        firstSymbolId = layer.id;
-        console.log("First symbol layer ID:", firstSymbolId);
-        break;
-      }
-    }
+  console.log("Displaying climbs:", climbs);
 
-    climbs.forEach((climb, index) => {
-      if (climb.category) {
-        // Add a marker at the start of the route
-        console.log(
-          `Adding marker for climb: ${climb.name}, Category: ${climb.category}`
-        );
-        new mapboxgl.Marker()
-          .setLngLat(climb.coordinates[0]) // Start of the route
-          .setPopup(
-            new mapboxgl.Popup().setText(`${climb.name} - ${climb.category}`)
-          )
-          .addTo(map);
+  climbs.forEach((climb, index) => {
+    console.log(`Adding route for climb: ${climb.name}`);
 
-        // Plot the route on the map
-        const routeGeoJSON = {
-          type: "Feature",
-          geometry: {
-            type: "LineString",
-            coordinates: climb.coordinates, // The entire array of coordinates
-          },
-        };
-
-        console.log(`Adding route layer for climb: ${climb.name}`);
-        // Add the route as a layer to the map
-        map.addLayer(
-          {
-            id: `route-${index}`, // Unique ID for each route
-            type: "line",
-            source: {
-              type: "geojson",
-              data: routeGeoJSON,
-            },
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#FF5733", // Customize the color
-              "line-width": 4, // Customize the line width
-            },
-          },
-          firstSymbolId
-        ); // Add the layer beneath the first symbol layer
-      }
+    map.addSource(`route-source-${index}`, {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: climb.coordinates,
+        },
+      },
     });
+
+    map.addLayer({
+      id: `route-${index}`,
+      type: "line",
+      source: `route-source-${index}`,
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#FF5733",
+        "line-width": 4,
+      },
+    });
+
+    // Add a marker for the start of the climb
+    new mapboxgl.Marker()
+      .setLngLat(climb.coordinates[0])
+      .setPopup(
+        new mapboxgl.Popup().setHTML(
+          `<h3>${climb.name}</h3><p>Category: ${climb.category}</p>`
+        )
+      )
+      .addTo(map);
   });
 }
