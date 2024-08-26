@@ -115,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ////////////////////////////////////////
 
-
 /*
 
 //Mapbox PROJECT STARTS HERE
@@ -156,3 +155,5 @@ function initializeMap() {
 
   // Optional: Add other map setup or event listeners here
 }
+
+*/
