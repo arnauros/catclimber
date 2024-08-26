@@ -266,3 +266,5 @@ function calculateClimbCategory(length, gradient) {
 
   return null; // Default case, though it should not be reached
 }
+
+//working well
