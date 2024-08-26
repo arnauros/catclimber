@@ -334,19 +334,18 @@ function visualizeClimbs(climbs) {
 }
 
 // Wait until the map is fully loaded before adding the line
-map.on("load", function () {
+map.on("load", () => {
   // Define the coordinates for the line
   const lineCoordinates = [
     [3.10093, 41.85876], // Starting point (Barcelona)
     [3.10017, 41.85855], // Another point in Barcelona
   ];
 
-  // Add a new source for the line
-  map.addSource("test-line-source", {
+  // Add a new source for your line data
+  map.addSource("test-line", {
     type: "geojson",
     data: {
       type: "Feature",
-      properties: {},
       geometry: {
         type: "LineString",
         coordinates: lineCoordinates,
@@ -354,18 +353,18 @@ map.on("load", function () {
     },
   });
 
-  // Add a new layer to visualize the line
+  // Add a new layer for your line
   map.addLayer({
     id: "test-line-layer",
     type: "line",
-    source: "test-line-source",
+    source: "test-line",
     layout: {
       "line-join": "round",
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000", // Red color for the line
-      "line-width": 5, // Line width in pixels
+      "line-color": "#FF0000", // Line color (red)
+      "line-width": 5, // Line width
     },
   });
 
