@@ -101,6 +101,7 @@ function setupGeolocation() {
   const geolocateButton = document.getElementById("geolocateButton");
 
   geolocateButton.addEventListener("click", function () {
+    preventDefault(); // Prevent the default form submission behavior
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function (position) {
