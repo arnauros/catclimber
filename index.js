@@ -227,7 +227,8 @@ function findClimbs(elevationPoints) {
       console.log(
         `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
       );
-      if (totalElevationGain > 100 && currentClimb.length > 5) {
+      if (totalElevationGain > 20 && currentClimb.length > 2) {
+        // Lowered criteria
         climbs.push({
           coordinates: currentClimb.map((point) => point.coordinates),
           elevationGain: totalElevationGain,
