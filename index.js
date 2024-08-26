@@ -167,7 +167,7 @@ function setupGeolocation() {
 }
 
 // Function to fetch climb data using the Mapbox API and visualize the search area
-function fetchClimbData(location, radius = 20000) {
+function fetchClimbData(location, radius = 5000) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
   },${location[1]}.json?radius=${
@@ -259,7 +259,7 @@ function findClimbs(elevationPoints) {
         `Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`
       );
       // Adjust the minimum criteria for elevation gain and length
-      if (totalElevationGain > 100 && currentClimb.length > 5) {
+      if (totalElevationGain > 0 && currentClimb.length > 1) {
         // Increase elevation gain threshold to 100m and length to 5 points
         climbs.push({
           name: `Climb ${climbs.length + 1}`,
