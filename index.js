@@ -95,3 +95,34 @@ function searchLocation(query) {
     })
     .catch((error) => console.error("Error:", error));
 }
+
+// Function to set up geolocation functionality
+function setupGeolocation() {
+  const geolocateButton = document.getElementById("geolocateButton");
+
+  geolocateButton.addEventListener("click", function () {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const userCoordinates = [
+            position.coords.longitude,
+            position.coords.latitude,
+          ];
+          map.flyTo({
+            center: userCoordinates,
+            zoom: 12, // Adjust zoom level as needed
+          });
+
+          // Optionally, add a marker at the user's location
+          new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+        },
+        function (error) {
+          console.error("Error getting geolocation: ", error);
+          alert("Unable to retrieve your location.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  });
+}
