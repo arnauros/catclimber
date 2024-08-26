@@ -193,65 +193,69 @@ function calculateClimbCategory(length, gradient) {
 ///////////////////// Finding the climbs ///////////////////////
 
 function fetchClimbData(location, radius = 50) {
-  const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${location[0]},${location[1]}.json?radius=${radius * 1000}&limit=500&access_token=${mapboxToken}`;
+  const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
+    location[0]
+  },${location[1]}.json?radius=${
+    radius * 1000
+  }&limit=50&access_token=${mapboxToken}`;
 
   fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      console.log("Raw data received:", data);
-      const elevationPoints = data.features.map(feature => ({
+    .then((response) => response.json())
+    .then((data) => {
+      const elevationPoints = data.features.map((feature) => ({
         coordinates: feature.geometry.coordinates,
-        elevation: feature.properties.ele
+        elevation: feature.properties.ele,
       }));
-      const climbs = findClimbs(elevationPoints);
-      displayClimbs(climbs);
+      findClimbs(elevationPoints);
     })
-    .catch(error => console.error("Error fetching elevation data:", error));
+    .catch((error) => console.error("Error fetching elevation data:", error));
 }
 
 function findClimbs(elevationPoints) {
-  console.log("Elevation points received:", elevationPoints.length);
   const climbs = [];
   let currentClimb = [];
   let totalElevationGain = 0;
 
   for (let i = 1; i < elevationPoints.length; i++) {
-    const elevationDiff = elevationPoints[i].elevation - elevationPoints[i-1].elevation;
+    const elevationDiff =
+      elevationPoints[i].elevation - elevationPoints[i - 1].elevation;
     if (elevationDiff > 0) {
       currentClimb.push(elevationPoints[i]);
       totalElevationGain += elevationDiff;
     } else if (currentClimb.length > 0) {
-      console.log(`Potential climb found: Length ${currentClimb.length}, Elevation gain ${totalElevationGain}`);
-      if (totalElevationGain > 20 && currentClimb.length > 2) { // Lowered criteria
+      if (totalElevationGain > 100 && currentClimb.length > 5) {
+        // Minimum 100m elevation gain and 5 points
         climbs.push({
-          coordinates: currentClimb.map(point => point.coordinates),
+          coordinates: currentClimb.map((point) => point.coordinates),
           elevationGain: totalElevationGain,
-          length: calculateDistance(currentClimb)
+          length: calculateDistance(currentClimb),
         });
-        console.log("Climb added");
       }
       currentClimb = [];
       totalElevationGain = 0;
     }
   }
 
-  console.log(`Total climbs found: ${climbs.length}`);
-  return climbs;
+  displayClimbs(climbs);
 }
 
 function calculateDistance(points) {
   let distance = 0;
   for (let i = 1; i < points.length; i++) {
-    const dx = points[i].coordinates[0] - points[i-1].coordinates[0];
-    const dy = points[i].coordinates[1] - points[i-1].coordinates[1];
-    distance += Math.sqrt(dx*dx + dy*dy);
+    const dx = points[i].coordinates[0] - points[i - 1].coordinates[0];
+    const dy = points[i].coordinates[1] - points[i - 1].coordinates[1];
+    distance += Math.sqrt(dx * dx + dy * dy);
   }
   return distance * 111000; // Rough conversion to meters
 }
 
 function displayClimbs(climbs) {
   if (!map.loaded()) {
-    map.on('load', () => displayClimbs(climbs));
+    map.on("load", () => {
+      // Use the map center as the location to fetch climbs
+      const center = map.getCenter();
+      fetchClimbData([center.lng, center.lat]);
+    });
     return;
   }
 
@@ -259,59 +263,66 @@ function displayClimbs(climbs) {
 
   climbs.forEach((climb, index) => {
     const climbCategory = categorizeClimb(climb.length, climb.elevationGain);
-    
+
     map.addSource(`climb-source-${index}`, {
-      type: 'geojson',
+      type: "geojson",
       data: {
-        type: 'Feature',
+        type: "Feature",
         properties: {},
         geometry: {
-          type: 'LineString',
-          coordinates: climb.coordinates
-        }
-      }
+          type: "LineString",
+          coordinates: climb.coordinates,
+        },
+      },
     });
 
     map.addLayer({
       id: `climb-${index}`,
-      type: 'line',
+      type: "line",
       source: `climb-source-${index}`,
       layout: {
-        'line-join': 'round',
-        'line-cap': 'round'
+        "line-join": "round",
+        "line-cap": "round",
       },
       paint: {
-        'line-color': getClimbColor(climbCategory),
-        'line-width': 4
-      }
+        "line-color": getClimbColor(climbCategory),
+        "line-width": 4,
+      },
     });
 
     new mapboxgl.Marker()
       .setLngLat(climb.coordinates[0])
-      .setPopup(new mapboxgl.Popup().setHTML(`<h3>Climb ${index + 1}</h3><p>Category: ${climbCategory}</p><p>Length: ${(climb.length/1000).toFixed(2)} km</p><p>Elevation Gain: ${climb.elevationGain.toFixed(0)} m</p>`))
+      .setPopup(
+        new mapboxgl.Popup().setHTML(
+          `<h3>Climb ${
+            index + 1
+          }</h3><p>Category: ${climbCategory}</p><p>Length: ${(
+            climb.length / 1000
+          ).toFixed(2)} km</p><p>Elevation Gain: ${climb.elevationGain.toFixed(
+            0
+          )} m</p>`
+        )
+      )
       .addTo(map);
   });
 }
 
 function categorizeClimb(length, elevationGain) {
   const gradient = (elevationGain / length) * 100;
-  if (gradient > 10) return 'HC';
-  if (gradient > 8) return '1';
-  if (gradient > 6) return '2';
-  if (gradient > 4) return '3';
-  return '4';
+  if (gradient > 10) return "HC";
+  if (gradient > 8) return "1";
+  if (gradient > 6) return "2";
+  if (gradient > 4) return "3";
+  return "4";
 }
 
 function getClimbColor(category) {
-  switch(category) {
-    case 'HC': return '#FF0000';
-    case '1': return '#FF6600';
-    case '2': return '#FFCC00';
-    case '3': return '#66CC00';
-    default: return '#0099CC';
-  }
-}
-
+  switch (category) {
+    case "HC":
+      return "#FF0000";
+    case "1":
+      return "#FF6600";
+    case "2":
       return "#FFCC00";
     case "3":
       return "#66CC00";
