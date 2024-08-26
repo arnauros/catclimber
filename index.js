@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
     // addTestLine(); // Add a test line to the map
+    plotRoute([2.154007, 41.390205], [2.177432, 41.382894]);
   });
 });
 
