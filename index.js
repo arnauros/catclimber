@@ -166,7 +166,7 @@ function setupGeolocation() {
   });
 }
 
-// Function to fetch climb data using the Mapbox API
+// Function to fetch climb data using the Mapbox API and visualize the search area
 function fetchClimbData(location, radius = 20000) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${
     location[0]
