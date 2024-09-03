@@ -189,12 +189,15 @@ function fetchRoadData(location, radius = 5000) {
     .catch((error) => console.error("Error fetching road data:", error));
 }
 
+//==========================================
+//          visualising roads
+//==========================================
+
 // Function to visualize roads on the map
 function visualizeRoads(features) {
   features.forEach((feature, index) => {
-    console.log(
-      `Visualizing road: ${feature.properties.name || "Unnamed Road"}`
-    );
+    const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
+    console.log(`Visualizing road: ${roadName}`);
 
     // Add a source for the road
     map.addSource(`road-source-${index}`, {
