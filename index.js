@@ -262,7 +262,6 @@ function visualizeRoads(features) {
         },
       });
       console.log(`Added source for ${roadName}`); // <-- Add this log
-      console.log("------------------");
 
       // Add the road layer, placing it above existing road layers
       map.addLayer(
@@ -283,8 +282,10 @@ function visualizeRoads(features) {
       );
 
       console.log(`Added layer for road ${index + 1}: ${roadName}`);
+      console.log("------------------");
     } else {
       console.log(`Skipping feature ${index + 1}: Not a road`);
+      console.log("------------------");
     }
   });
 }
