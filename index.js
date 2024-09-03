@@ -320,19 +320,20 @@ function addSearchAreaToMap(coordinates, sourceId) {
     },
   });
 
-  map.addLayer({
-    id: `road-layer-${index}`,
-    type: "line", // Correct type for drawing lines
-    source: `road-source-${index}`,
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
+  map.addLayer(
+    {
+      id: `road-layer-${index}`,
+      type: "line",
+      source: `road-source-${index}`,
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#FF5733", // Customize the color as needed
+        "line-width": 4,
+      },
     },
-    paint: {
-      "line-color": "#FF5733", // Customize the color as needed
-      "line-width": 4,
-    },
-  });
-
-  console.log(`Search area layer added`);
+    firstSymbolId
+  ); // Place the road layer beneath labels
 }
