@@ -321,12 +321,16 @@ function addSearchAreaToMap(coordinates, sourceId) {
   });
 
   map.addLayer({
-    id: `search-area-layer`,
-    type: "fill",
-    source: sourceId,
+    id: `road-layer-${index}`,
+    type: "line", // Correct type for drawing lines
+    source: `road-source-${index}`,
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
     paint: {
-      "fill-color": "#FF5733",
-      "fill-opacity": 0.3,
+      "line-color": "#FF5733", // Customize the color as needed
+      "line-width": 4,
     },
   });
 
