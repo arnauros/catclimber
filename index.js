@@ -175,6 +175,15 @@ function fetchRoadData(location, radius = 500) {
 
 // Function to visualize roads on the map
 function visualizeRoads(features) {
+  const layers = map.getStyle().layers;
+  let firstSymbolId;
+  for (const layer of layers) {
+    if (layer.type === "symbol") {
+      firstSymbolId = layer.id;
+      break;
+    }
+  }
+
   features.forEach((feature, index) => {
     if (
       feature.properties.class &&
