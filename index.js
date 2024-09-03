@@ -195,27 +195,31 @@ function fetchRoadData(location, radius = 1000) {
 }
 
 //==========================================
-//          visualizing roads
+//          Visualizing Roads
 //==========================================
 
 // Function to visualize roads on the map
 function visualizeRoads(features) {
-  // Remove existing road layers and sources
+  // Remove existing road layers
   map.getStyle().layers.forEach((layer) => {
     if (layer.id.startsWith("road-layer-")) {
       map.removeLayer(layer.id);
     }
   });
 
+  // Remove existing road sources
   Object.keys(map.getStyle().sources).forEach((source) => {
     if (source.startsWith("road-source-")) {
       map.removeSource(source);
     }
   });
 
+  // Iterate over the features returned by the Tilequery API
   features.forEach((feature, index) => {
+    const roadClass = feature.properties.class;
+
     if (
-      feature.properties.class &&
+      roadClass &&
       [
         "street",
         "primary",
@@ -228,25 +232,23 @@ function visualizeRoads(features) {
         "motorway",
         "path",
         "unclassified",
-        "road-street-low", // Added based on your mapbox studio configuration
+        "road-street-low",
         "road-primary",
         "road-secondary",
         "road-street",
-      ].includes(feature.properties.class)
+      ].includes(roadClass)
     ) {
       const roadName =
         feature.properties.name ||
-        `${
-          feature.properties.class.charAt(0).toUpperCase() +
-          feature.properties.class.slice(1)
-        } Road ${index + 1}`;
-
+        `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
+          index + 1
+        }`;
       console.log(`Visualizing road: ${roadName}`);
 
       const sourceId = `road-source-${index}`;
       const layerId = `road-layer-${index}`;
 
-      // Add the source for the road
+      // Add the source for the road feature
       map.addSource(sourceId, {
         type: "geojson",
         data: {
@@ -256,7 +258,7 @@ function visualizeRoads(features) {
         },
       });
 
-      // Add the layer for the road, ensuring it's below existing labels
+      // Add the road layer, placing it above existing road layers
       map.addLayer(
         {
           id: layerId,
@@ -267,13 +269,12 @@ function visualizeRoads(features) {
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#FF5733",
+            "line-color": "#FF5733", // Customize color as needed
             "line-width": 4,
           },
         },
-        // Insert the layer below the labels layer
-        map.getStyle().layers.find((l) => l.type === "symbol").id
-      );
+        "waterway-label"
+      ); // Add above existing layers (e.g., above waterway-labels or other key layers)
 
       console.log(`Added layer for road ${index + 1}: ${roadName}`);
     } else {
