@@ -121,10 +121,15 @@ function searchLocation(query) {
     .then((data) => {
       if (data.features.length > 0) {
         const coordinates = data.features[0].center;
+        const placeName = data.features[0].place_name; // Get the place name (including road name)
+
+        console.log(`Found location: ${placeName}`);
+
         map.flyTo({
           center: coordinates,
           zoom: 12, // Adjust zoom level as needed
         });
+
         // Fetch and display data for the searched location
         fetchRoadData(coordinates);
       } else {
