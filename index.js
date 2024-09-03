@@ -56,18 +56,30 @@ function locateUser() {
         // Add a marker at the user's location
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
 
-        // Fetch and display data around the user's location
-        fetchRoadData(userCoordinates);
+        // Visualize roads at user's location
+        addCustomRoadLayer(userCoordinates);
       },
       function (error) {
         console.error("Error getting geolocation:", error);
         // Fallback to default location (Barcelona) if geolocation fails
-        fetchRoadData(defaultLocation);
+        map.flyTo({
+          center: defaultLocation,
+          zoom: 12, // Adjust zoom level as needed
+        });
+
+        // Visualize roads at default location
+        addCustomRoadLayer(defaultLocation);
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
-    fetchRoadData(defaultLocation); // Fallback to Barcelona if geolocation isn't available
+    map.flyTo({
+      center: defaultLocation,
+      zoom: 12, // Adjust zoom level as needed
+    });
+
+    // Visualize roads at default location
+    addCustomRoadLayer(defaultLocation);
   }
 }
 
@@ -130,8 +142,8 @@ function searchLocation(query) {
           zoom: 12, // Adjust zoom level as needed
         });
 
-        // Fetch and display data for the searched location
-        fetchRoadData(coordinates);
+        // Visualize roads at searched location
+        addCustomRoadLayer(coordinates);
       } else {
         alert("Location not found");
       }
@@ -160,6 +172,9 @@ function setupGeolocation() {
 
           // Add a marker at the user's location
           new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+
+          // Visualize roads at user's location
+          addCustomRoadLayer(userCoordinates);
         },
         function (error) {
           console.error("Error getting geolocation:", error);
@@ -172,130 +187,46 @@ function setupGeolocation() {
   });
 }
 
-// Function to fetch road data using the Mapbox API and visualize the search area
-function fetchRoadData(location, radius = 1000) {
-  const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
-
-  // Draw the search area on the map as a circle
-  drawSearchArea(location, radius);
-
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message) {
-        console.error("Error in API response:", data.message);
-        return;
-      }
-      console.log("Road data received:", data);
-
-      // After drawing the search area, visualize the roads last
-      visualizeRoads(data.features);
-    })
-    .catch((error) => console.error("Error fetching road data:", error));
-}
-
-//==========================================
-//          Visualizing Roads
-//==========================================
-
-// Function to visualize roads on the map
-function visualizeRoads(features) {
-  // Remove existing road layers
-  map.getStyle().layers.forEach((layer) => {
-    if (layer.id.startsWith("road-layer-")) {
-      map.removeLayer(layer.id);
-    }
+// Function to add a custom road layer
+function addCustomRoadLayer(center) {
+  map.addLayer({
+    id: "custom-roads",
+    type: "line",
+    source: {
+      type: "vector",
+      url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
+    },
+    "source-layer": "road", // Specify the source layer
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "#FF0000", // Customize color as needed
+      "line-width": 4,
+    },
+    filter: [
+      "in",
+      "class",
+      "street",
+      "primary",
+      "secondary",
+      "tertiary",
+      "residential",
+      "road",
+      "track",
+      "service",
+      "motorway",
+      "path",
+      "unclassified",
+      "road-street-low",
+      "road-primary",
+      "road-secondary",
+      "road-street",
+    ], // Only show roads that match these classes
   });
 
-  // Remove existing road sources
-  Object.keys(map.getStyle().sources).forEach((source) => {
-    if (source.startsWith("road-source-")) {
-      map.removeSource(source);
-    }
-  });
-
-  // Iterate over the features returned by the Tilequery API
-  features.forEach((feature, index) => {
-    // Filter out features that do not have LineString geometry
-    if (feature.geometry.type === "LineString") {
-      console.log("Feature properties:", feature.properties);
-      const roadClass = feature.properties.class;
-
-      if (
-        roadClass &&
-        [
-          "street",
-          "primary",
-          "secondary",
-          "tertiary",
-          "residential",
-          "road",
-          "track",
-          "service",
-          "motorway",
-          "path",
-          "unclassified",
-          "road-street-low",
-          "road-primary",
-          "road-secondary",
-          "road-street",
-        ].includes(roadClass)
-      ) {
-        const roadName =
-          feature.properties.name ||
-          `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
-            index + 1
-          }`;
-        console.log("------------------");
-        console.log(`Visualizing road: ${roadName}`);
-        console.log("Feature coordinates:", feature.geometry.coordinates);
-
-        const sourceId = `road-source-${index}`;
-        const layerId = `road-layer-${index}`;
-
-        // Add the source for the road feature
-        map.addSource(sourceId, {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            properties: {},
-            geometry: feature.geometry,
-          },
-        });
-        console.log(`Added source for ${roadName}`); // <-- Add this log
-
-        // Add the road layer, placing it above existing road layers
-        map.addLayer(
-          {
-            id: layerId,
-            type: "line",
-            source: sourceId,
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#FF0000", // Customize color as needed
-              "line-width": 4,
-            },
-          },
-          undefined // Place this layer on top of all others
-        );
-
-        console.log(`Added layer for road ${index + 1}: ${roadName}`);
-        console.log("------------------");
-      } else {
-        console.log(`Skipping feature ${index + 1}: Not a road`);
-        console.log("------------------");
-      }
-    } else {
-      console.log(
-        `Skipping feature ${index + 1}: Not a LineString (found ${
-          feature.geometry.type
-        })`
-      );
-    }
-  });
+  console.log("Custom road layer added");
 }
 
 // Function to draw the search area on the map
