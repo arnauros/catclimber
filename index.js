@@ -246,6 +246,7 @@ function visualizeRoads(features) {
           index + 1
         }`;
       console.log(`Visualizing road: ${roadName}`);
+      console.log("Feature coordinates:", feature.geometry.coordinates);
 
       const sourceId = `road-source-${index}`;
       const layerId = `road-layer-${index}`;
