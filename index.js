@@ -225,7 +225,7 @@ function visualizeRoads(features) {
     });
 
     // Log if the layer is added successfully
-    console.log(`Added layer for road ${index + 1}: ${roadName}`);
+    console.log(`Added layer for road ${index + 1}: updated ${roadName}`);
   });
 }
 
