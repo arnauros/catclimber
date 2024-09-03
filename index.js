@@ -202,7 +202,17 @@ function fetchRoadData(location, radius = 5000) {
 function visualizeRoads(features) {
   features.forEach((feature, index) => {
     // Filter only the features that belong to the 'road' layer
-    if (feature.properties.layer === "road") {
+    if (
+      feature.properties.class &&
+      [
+        "street",
+        "primary",
+        "secondary",
+        "tertiary",
+        "residential",
+        "road",
+      ].includes(feature.properties.class)
+    ) {
       const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
       console.log(`Visualizing road: ${roadName}`);
 
