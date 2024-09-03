@@ -16,9 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     locateUser(); // Call the function to locate the user after map is loaded
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
-    fetchRoadData();
-    drawSearchArea(); // Call the function to fetch road data
-    // addHardcodedRoad(); // Add this line to call the new function
   });
 });
 
@@ -373,64 +370,3 @@ function visualizeRoads(features) {
     console.log("Search area layer added");
   }
 }
-
-//==========================================
-//          hardcoding a line
-//==========================================
-
-/*
-
-// Function to add a hardcoded road
-function addHardcodedRoad() {
-  // Check if the map style has finished loading
-  if (!map.isStyleLoaded()) {
-    console.log("Map style not yet loaded. Retrying in 100ms...");
-    setTimeout(addHardcodedRoad, 100);
-    return;
-  }
-
-  console.log("Adding hardcoded road...");
-
-  // Remove existing hardcoded road if it exists
-  if (map.getLayer("hardcoded-road")) {
-    map.removeLayer("hardcoded-road");
-  }
-  if (map.getSource("hardcoded-road")) {
-    map.removeSource("hardcoded-road");
-  }
-
-  // Add a source for our hardcoded road
-  map.addSource("hardcoded-road", {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [3.1010207727542536, 41.85888759527481],
-          [3.4010207727542536, 41.15888759527481], // Ending point (adjust as needed)
-        ],
-      },
-    },
-  });
-
-  // Add a layer to display the hardcoded road
-  map.addLayer({
-    id: "hardcoded-road",
-    type: "line",
-    source: "hardcoded-road",
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
-    },
-    paint: {
-      "line-color": "#FF0000", // Red color for visibility
-      "line-width": 8,
-    },
-  });
-
-  console.log("Hardcoded road added successfully.");
-}
-
-*/
