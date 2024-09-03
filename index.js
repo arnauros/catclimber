@@ -283,6 +283,7 @@ function visualizeRoads(features) {
   });
 }
 
+/*
 // Function to draw the search area on the map
 function drawSearchArea(location, radiusInMeters) {
   const searchAreaSourceId = "search-area";
@@ -355,3 +356,4 @@ function addSearchAreaToMap(coordinates, sourceId) {
 
   console.log("Search area layer added");
 }
+*/
