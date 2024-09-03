@@ -200,17 +200,21 @@ function fetchRoadData(location, radius = 1000) {
 
 // Function to visualize roads on the map
 function visualizeRoads(features) {
-  const layers = map.getStyle().layers;
-  let firstSymbolId;
-  for (const layer of layers) {
-    if (layer.type === "symbol") {
-      firstSymbolId = layer.id;
-      break;
+  // Remove existing road layers
+  map.getStyle().layers.forEach((layer) => {
+    if (layer.id.startsWith("road-layer-")) {
+      map.removeLayer(layer.id);
     }
-  }
+  });
+
+  // Remove existing road sources
+  Object.keys(map.getStyle().sources).forEach((source) => {
+    if (source.startsWith("road-source-")) {
+      map.removeSource(source);
+    }
+  });
 
   features.forEach((feature, index) => {
-    // Filter only the features that belong to the 'road' layer
     if (
       feature.properties.class &&
       [
@@ -227,7 +231,6 @@ function visualizeRoads(features) {
         "unclassified",
       ].includes(feature.properties.class)
     ) {
-      // Provide a more descriptive fallback name
       const roadName =
         feature.properties.name ||
         `${
@@ -237,8 +240,10 @@ function visualizeRoads(features) {
 
       console.log(`Visualizing road: ${roadName}`);
 
-      // Add a source for the road
-      map.addSource(`road-source-${index}`, {
+      const sourceId = `road-source-${index}`;
+      const layerId = `road-layer-${index}`;
+
+      map.addSource(sourceId, {
         type: "geojson",
         data: {
           type: "Feature",
@@ -247,23 +252,19 @@ function visualizeRoads(features) {
         },
       });
 
-      // Add a layer to visualize the road, beneath the first symbol layer
-      map.addLayer(
-        {
-          id: `road-layer-${index}`,
-          type: "line",
-          source: `road-source-${index}`,
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#FF5733", // Customize the color as needed
-            "line-width": 4,
-          },
+      map.addLayer({
+        id: layerId,
+        type: "line",
+        source: sourceId,
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
         },
-        firstSymbolId
-      );
+        paint: {
+          "line-color": "#FF5733",
+          "line-width": 4,
+        },
+      });
 
       console.log(`Added layer for road ${index + 1}: ${roadName}`);
     } else {
