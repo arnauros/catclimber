@@ -389,7 +389,7 @@ function addHardcodedRoad() {
         type: "LineString",
         coordinates: [
           [3.1010207727542536, 41.85888759527481],
-          [3.1010207727542536, 41.85888759527481], // Ending point (adjust as needed)
+          [3.4010207727542536, 41.15888759527481], // Ending point (adjust as needed)
         ],
       },
     },
