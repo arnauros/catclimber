@@ -229,6 +229,10 @@ function visualizeRoads(features) {
         "motorway",
         "path",
         "unclassified",
+        "road-street-low", // Add these based on your mapbox studio configuration
+        "road-primary",
+        "road-secondary",
+        "road-street",
       ].includes(feature.properties.class)
     ) {
       const roadName =
