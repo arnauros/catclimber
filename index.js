@@ -200,14 +200,13 @@ function fetchRoadData(location, radius = 1000) {
 
 // Function to visualize roads on the map
 function visualizeRoads(features) {
-  // Remove existing road layers
+  // Remove existing road layers and sources
   map.getStyle().layers.forEach((layer) => {
     if (layer.id.startsWith("road-layer-")) {
       map.removeLayer(layer.id);
     }
   });
 
-  // Remove existing road sources
   Object.keys(map.getStyle().sources).forEach((source) => {
     if (source.startsWith("road-source-")) {
       map.removeSource(source);
@@ -229,7 +228,7 @@ function visualizeRoads(features) {
         "motorway",
         "path",
         "unclassified",
-        "road-street-low", // Add these based on your mapbox studio configuration
+        "road-street-low", // Added based on your mapbox studio configuration
         "road-primary",
         "road-secondary",
         "road-street",
@@ -247,6 +246,7 @@ function visualizeRoads(features) {
       const sourceId = `road-source-${index}`;
       const layerId = `road-layer-${index}`;
 
+      // Add the source for the road
       map.addSource(sourceId, {
         type: "geojson",
         data: {
@@ -256,19 +256,24 @@ function visualizeRoads(features) {
         },
       });
 
-      map.addLayer({
-        id: layerId,
-        type: "line",
-        source: sourceId,
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
+      // Add the layer for the road, ensuring it's below existing labels
+      map.addLayer(
+        {
+          id: layerId,
+          type: "line",
+          source: sourceId,
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#FF5733",
+            "line-width": 4,
+          },
         },
-        paint: {
-          "line-color": "#FF5733",
-          "line-width": 4,
-        },
-      });
+        // Insert the layer below the labels layer
+        map.getStyle().layers.find((l) => l.type === "symbol").id
+      );
 
       console.log(`Added layer for road ${index + 1}: ${roadName}`);
     } else {
