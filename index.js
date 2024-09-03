@@ -327,6 +327,7 @@ function addSearchAreaToMap(coordinates, sourceId, layerId) {
     layout: {
       "line-join": "round",
       "line-cap": "round",
+      visibility: "visible", // Ensure visibility is set
     },
     paint: {
       "line-color": "#FF5733", // Customize the color as needed
