@@ -321,12 +321,18 @@ function addSearchAreaToMap(coordinates, sourceId, layerId) {
   });
 
   map.addLayer({
-    id: layerId,
-    type: "fill",
-    source: sourceId,
+    id: `road-layer-${index}`,
+    type: "line",
+    source: `road-source-${index}`,
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
     paint: {
-      "fill-color": "#FF5733",
-      "fill-opacity": 0.3,
+      "line-color": "#FF5733", // Customize the color as needed
+      "line-width": 4,
     },
   });
+
+  console.log(`Layer added: road-layer-${index}`);
 }
