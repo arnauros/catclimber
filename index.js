@@ -34,7 +34,7 @@ function initializeMap() {
   // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/streets-v11", // Map style
+    style: "mapbox://styles/mapbox/outdoors-v11", // Map style
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
