@@ -216,155 +216,160 @@ function visualizeRoads(features) {
   });
 
   // Iterate over the features returned by the Tilequery API
-features.forEach((feature, index) => {
-  // Filter out features that do not have LineString geometry
-  if (feature.geometry.type === "LineString") {
-    console.log("Feature properties:", feature.properties);
-    const roadClass = feature.properties.class;
+  features.forEach((feature, index) => {
+    // Filter out features that do not have LineString geometry
+    if (feature.geometry.type === "LineString") {
+      console.log("Feature properties:", feature.properties);
+      const roadClass = feature.properties.class;
 
-    if (
-      roadClass &&
-      [
-        "street",
-        "primary",
-        "secondary",
-        "tertiary",
-        "residential",
-        "road",
-        "track",
-        "service",
-        "motorway",
-        "path",
-        "unclassified",
-        "road-street-low",
-        "road-primary",
-        "road-secondary",
-        "road-street",
-      ].includes(roadClass)
-    ) {
-      const roadName =
-        feature.properties.name ||
-        `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
-          index + 1
-        }`;
-      console.log("------------------");
-      console.log(`Visualizing road: ${roadName}`);
-      console.log("Feature coordinates:", feature.geometry.coordinates);
+      if (
+        roadClass &&
+        [
+          "street",
+          "primary",
+          "secondary",
+          "tertiary",
+          "residential",
+          "road",
+          "track",
+          "service",
+          "motorway",
+          "path",
+          "unclassified",
+          "road-street-low",
+          "road-primary",
+          "road-secondary",
+          "road-street",
+        ].includes(roadClass)
+      ) {
+        const roadName =
+          feature.properties.name ||
+          `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
+            index + 1
+          }`;
+        console.log("------------------");
+        console.log(`Visualizing road: ${roadName}`);
+        console.log("Feature coordinates:", feature.geometry.coordinates);
 
-      const sourceId = `road-source-${index}`;
-      const layerId = `road-layer-${index}`;
+        const sourceId = `road-source-${index}`;
+        const layerId = `road-layer-${index}`;
 
-      // Add the source for the road feature
-      map.addSource(sourceId, {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry: feature.geometry,
-        },
-      });
-      console.log(`Added source for ${roadName}`); // <-- Add this log
-
-      // Add the road layer, placing it above existing road layers
-      map.addLayer(
-        {
-          id: layerId,
-          type: "line",
-          source: sourceId,
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
+        // Add the source for the road feature
+        map.addSource(sourceId, {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry: feature.geometry,
           },
-          paint: {
-            "line-color": "#FF0000", // Customize color as needed
-            "line-width": 4,
-          },
-        },
-        undefined // Place this layer on top of all others
-      );
+        });
+        console.log(`Added source for ${roadName}`); // <-- Add this log
 
-      console.log(`Added layer for road ${index + 1}: ${roadName}`);
-      console.log("------------------");
+        // Add the road layer, placing it above existing road layers
+        map.addLayer(
+          {
+            id: layerId,
+            type: "line",
+            source: sourceId,
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#FF0000", // Customize color as needed
+              "line-width": 4,
+            },
+          },
+          undefined // Place this layer on top of all others
+        );
+
+        console.log(`Added layer for road ${index + 1}: ${roadName}`);
+        console.log("------------------");
+      } else {
+        console.log(`Skipping feature ${index + 1}: Not a road`);
+        console.log("------------------");
+      }
     } else {
-      console.log(`Skipping feature ${index + 1}: Not a road`);
-      console.log("------------------");
+      console.log(
+        `Skipping feature ${index + 1}: Not a LineString (found ${
+          feature.geometry.type
+        })`
+      );
     }
-  } else {
-    console.log(`Skipping feature ${index + 1}: Not a LineString (found ${feature.geometry.type})`);
+  });
+
+  // Function to draw the search area on the map
+  function drawSearchArea(location, radiusInMeters) {
+    const searchAreaSourceId = "search-area";
+    const searchAreaLayerId = "search-area-layer";
+
+    // Convert radius from meters to kilometers for the circle creation
+    const radiusInKm = radiusInMeters / 1000;
+
+    // Remove existing search area layer and source if they exist
+    removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
+
+    // Create the circular polygon and add it to the map
+    const circlePolygon = createCirclePolygon(location, radiusInKm);
+    addSearchAreaToMap(circlePolygon, searchAreaSourceId);
   }
-});
 
-// Function to draw the search area on the map
-function drawSearchArea(location, radiusInMeters) {
-  const searchAreaSourceId = "search-area";
-  const searchAreaLayerId = "search-area-layer";
-
-  // Convert radius from meters to kilometers for the circle creation
-  const radiusInKm = radiusInMeters / 1000;
-
-  // Remove existing search area layer and source if they exist
-  removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
-
-  // Create the circular polygon and add it to the map
-  const circlePolygon = createCirclePolygon(location, radiusInKm);
-  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
-}
-
-// Function to remove existing search area layer and source from the map
-function removeExistingSearchArea(sourceId, layerId) {
-  if (map.getLayer(layerId)) {
-    map.removeLayer(layerId);
+  // Function to remove existing search area layer and source from the map
+  function removeExistingSearchArea(sourceId, layerId) {
+    if (map.getLayer(layerId)) {
+      map.removeLayer(layerId);
+    }
+    if (map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
   }
-  if (map.getSource(sourceId)) {
-    map.removeSource(sourceId);
+
+  // Function to create a circular polygon around a given point
+  function createCirclePolygon(center, radiusInKm, points = 64) {
+    const latitude = center[1];
+    const longitude = center[0];
+    const coordinates = [];
+
+    const distanceX =
+      radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+    const distanceY = radiusInKm / 110.574;
+
+    for (let i = 0; i < points; i++) {
+      const theta = (i / points) * (2 * Math.PI);
+      const x = distanceX * Math.cos(theta);
+      const y = distanceY * Math.sin(theta);
+      coordinates.push([longitude + x, latitude + y]);
+    }
+    coordinates.push(coordinates[0]); // Close the polygon
+
+    return coordinates;
   }
-}
 
-// Function to create a circular polygon around a given point
-function createCirclePolygon(center, radiusInKm, points = 64) {
-  const latitude = center[1];
-  const longitude = center[0];
-  const coordinates = [];
-
-  const distanceX =
-    radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
-  const distanceY = radiusInKm / 110.574;
-
-  for (let i = 0; i < points; i++) {
-    const theta = (i / points) * (2 * Math.PI);
-    const x = distanceX * Math.cos(theta);
-    const y = distanceY * Math.sin(theta);
-    coordinates.push([longitude + x, latitude + y]);
-  }
-  coordinates.push(coordinates[0]); // Close the polygon
-
-  return coordinates;
-}
-
-// Function to add the search area polygon to the map
-function addSearchAreaToMap(coordinates, sourceId) {
-  map.addSource(sourceId, {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [coordinates],
+  // Function to add the search area polygon to the map
+  function addSearchAreaToMap(coordinates, sourceId) {
+    map.addSource(sourceId, {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [coordinates],
+        },
       },
-    },
-  });
+    });
 
-  map.addLayer({
-    id: "search-area-layer",
-    type: "fill",
-    source: sourceId,
-    paint: {
-      "fill-color": "#FF5733",
-      "fill-opacity": 0.3,
-    },
-  });
+    map.addLayer({
+      id: "search-area-layer",
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": "#FF5733",
+        "fill-opacity": 0.3,
+      },
+    });
 
-  console.log("Search area layer added");
+    console.log("Search area layer added");
+  }
 }
 
 //==========================================
