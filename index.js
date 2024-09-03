@@ -337,3 +337,4 @@ function addSearchAreaToMap(coordinates, sourceId, index) {
     firstSymbolId
   ); // Place the road layer beneath labels
 }
+addSearchAreaToMap(circlePolygon, `search-area-${index}`, index);
