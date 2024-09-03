@@ -30,8 +30,6 @@ function initializeMap() {
   // Set the Mapbox access token
   mapboxgl.accessToken = mapboxToken;
 
-  console.log("Initializing map...");
-
   // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
@@ -39,49 +37,7 @@ function initializeMap() {
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
-
-  map.on("load", () => {
-    console.log("Map has loaded!");
-    addDebugLayer();
-  });
 }
-
-function addDebugLayer() {
-  if (!map.loaded()) {
-    console.log("Map not yet loaded, retrying in 100ms...");
-    setTimeout(addDebugLayer, 100);
-    return;
-  }
-
-  console.log("Adding debug layer...");
-
-  map.addSource("debug-source", {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "Point",
-        coordinates: defaultLocation,
-      },
-    },
-  });
-
-  map.addLayer({
-    id: "debug-layer",
-    type: "circle",
-    source: "debug-source",
-    paint: {
-      "circle-radius": 10,
-      "circle-color": "#ff0000",
-    },
-  });
-
-  console.log("Debug layer added successfully.");
-}
-
-// Ensure this line is present in your code to call initializeMap when the DOM is loaded
-document.addEventListener("DOMContentLoaded", initializeMap);
 
 // Function to automatically locate the user on page load
 function locateUser() {
