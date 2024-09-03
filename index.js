@@ -248,7 +248,6 @@ function visualizeRoads(features) {
       console.log(`Visualizing road: ${roadName}`);
       console.log("Feature coordinates:", feature.geometry.coordinates);
       console.log("Feature coordinates:", feature.geometry);
-      console.log("------------------");
 
       const sourceId = `road-source-${index}`;
       const layerId = `road-layer-${index}`;
@@ -263,6 +262,7 @@ function visualizeRoads(features) {
         },
       });
       console.log(`Added source for ${roadName}`); // <-- Add this log
+      console.log("------------------");
 
       // Add the road layer, placing it above existing road layers
       map.addLayer(
