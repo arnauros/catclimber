@@ -272,7 +272,7 @@ function visualizeRoads(features) {
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#FF5733", // Customize color as needed
+            "line-color": "#FF0000", // Customize color as needed
             "line-width": 4,
           },
         },
