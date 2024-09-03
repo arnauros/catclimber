@@ -1,5 +1,7 @@
 "use strict";
 
+// Mapbox PROJECT STARTS HERE
+
 // Global Variables
 const mapContainerId = "map"; // ID of the map div
 const defaultLocation = [2.154007, 41.390205]; // Default location (Barcelona coordinates)
@@ -19,16 +21,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Function to initialize the map
 function initializeMap() {
+  // Ensure the Mapbox GL JS library is loaded
   if (typeof mapboxgl === "undefined") {
     console.error("Mapbox GL JS is not loaded.");
     return;
   }
 
+  // Set the Mapbox access token
   mapboxgl.accessToken = mapboxToken;
 
+  // Initialize the map
   map = new mapboxgl.Map({
     container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/streets-v12", // Map style
+    style: "mapbox://styles/mapbox/streets-v11", // Map style
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
@@ -48,12 +53,16 @@ function locateUser() {
           zoom: 12, // Adjust zoom level as needed
         });
 
+        // Add a marker at the user's location
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
-        fetchRoadData(userCoordinates); // Fetch and display data around the user's location
+
+        // Fetch and display data around the user's location
+        fetchRoadData(userCoordinates);
       },
       function (error) {
         console.error("Error getting geolocation:", error);
-        fetchRoadData(defaultLocation); // Fallback to default location (Barcelona) if geolocation fails
+        // Fallback to default location (Barcelona) if geolocation fails
+        fetchRoadData(defaultLocation);
       }
     );
   } else {
@@ -64,17 +73,19 @@ function locateUser() {
 
 // Function to set up search functionality
 function setupSearch() {
+  // Prevent form submission
   const form = document.querySelector("form");
   if (form) {
     form.addEventListener("submit", function (event) {
-      event.preventDefault();
+      event.preventDefault(); // Prevent form submission
     });
   }
 
+  // Set up the search button click event
   document
     .getElementById("searchButton")
     .addEventListener("click", function (event) {
-      event.preventDefault();
+      event.preventDefault(); // Prevent the default form submission behavior
       const query = document.getElementById("searchLocate").value;
       if (query) {
         searchLocation(query);
@@ -83,11 +94,12 @@ function setupSearch() {
       }
     });
 
+  // Set up 'Enter' key press event on the input field
   document
     .getElementById("searchLocate")
     .addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
-        e.preventDefault();
+        e.preventDefault(); // Prevent the default form submission behavior
         const query = e.target.value;
         if (query) {
           searchLocation(query);
@@ -109,12 +121,17 @@ function searchLocation(query) {
     .then((data) => {
       if (data.features.length > 0) {
         const coordinates = data.features[0].center;
+        const placeName = data.features[0].place_name; // Get the place name (including road name)
+
+        console.log(`Found location: ${placeName}`);
+
         map.flyTo({
           center: coordinates,
-          zoom: 12,
+          zoom: 12, // Adjust zoom level as needed
         });
 
-        fetchRoadData(coordinates); // Fetch and display data for the searched location
+        // Fetch and display data for the searched location
+        fetchRoadData(coordinates);
       } else {
         alert("Location not found");
       }
@@ -127,7 +144,8 @@ function setupGeolocation() {
   const geolocateButton = document.getElementById("geolocateButton");
 
   geolocateButton.addEventListener("click", function (event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent any default behavior, such as form submission
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function (position) {
@@ -137,9 +155,10 @@ function setupGeolocation() {
           ];
           map.flyTo({
             center: userCoordinates,
-            zoom: 12,
+            zoom: 12, // Adjust zoom level as needed
           });
 
+          // Add a marker at the user's location
           new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
         },
         function (error) {
@@ -154,10 +173,11 @@ function setupGeolocation() {
 }
 
 // Function to fetch road data using the Mapbox API and visualize the search area
-function fetchRoadData(location, radius = 500) {
+function fetchRoadData(location, radius = 1000) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
 
-  drawSearchArea(location, radius); // Draw the search area on the map as a circle
+  // Draw the search area on the map as a circle
+  drawSearchArea(location, radius);
 
   fetch(url)
     .then((response) => response.json())
@@ -168,10 +188,15 @@ function fetchRoadData(location, radius = 500) {
       }
       console.log("Road data received:", data);
 
-      visualizeRoads(data.features); // After drawing the search area, visualize the roads last
+      // After drawing the search area, visualize the roads last
+      visualizeRoads(data.features);
     })
     .catch((error) => console.error("Error fetching road data:", error));
 }
+
+//==========================================
+//          visualizing roads
+//==========================================
 
 // Function to visualize roads on the map
 function visualizeRoads(features) {
@@ -185,6 +210,7 @@ function visualizeRoads(features) {
   }
 
   features.forEach((feature, index) => {
+    // Filter only the features that belong to the 'road' layer
     if (
       feature.properties.class &&
       [
@@ -201,6 +227,7 @@ function visualizeRoads(features) {
         "unclassified",
       ].includes(feature.properties.class)
     ) {
+      // Provide a more descriptive fallback name
       const roadName =
         feature.properties.name ||
         `${
@@ -210,6 +237,7 @@ function visualizeRoads(features) {
 
       console.log(`Visualizing road: ${roadName}`);
 
+      // Add a source for the road
       map.addSource(`road-source-${index}`, {
         type: "geojson",
         data: {
@@ -219,16 +247,7 @@ function visualizeRoads(features) {
         },
       });
 
-      // Get the first symbol layer id for placement reference
-      const layers = map.getStyle().layers;
-      let firstSymbolId;
-      for (const layer of layers) {
-        if (layer.type === "symbol") {
-          firstSymbolId = layer.id;
-          break;
-        }
-      }
-
+      // Add a layer to visualize the road, beneath the first symbol layer
       map.addLayer(
         {
           id: `road-layer-${index}`,
@@ -239,12 +258,12 @@ function visualizeRoads(features) {
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#FF5733",
+            "line-color": "#FF5733", // Customize the color as needed
             "line-width": 4,
           },
         },
         firstSymbolId
-      ); // Place the road layer beneath labels
+      );
 
       console.log(`Added layer for road ${index + 1}: ${roadName}`);
     } else {
@@ -258,9 +277,14 @@ function drawSearchArea(location, radiusInMeters) {
   const searchAreaSourceId = "search-area";
   const searchAreaLayerId = "search-area-layer";
 
+  // Convert radius from meters to kilometers for the circle creation
+  const radiusInKm = radiusInMeters / 1000;
+
+  // Remove existing search area layer and source if they exist
   removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
 
-  const circlePolygon = createCirclePolygon(location, radiusInMeters / 1000);
+  // Create the circular polygon and add it to the map
+  const circlePolygon = createCirclePolygon(location, radiusInKm);
   addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
 
@@ -317,4 +341,6 @@ function addSearchAreaToMap(coordinates, sourceId) {
       "fill-opacity": 0.3,
     },
   });
+
+  console.log("Search area layer added");
 }
