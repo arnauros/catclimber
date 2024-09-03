@@ -188,10 +188,8 @@ function fetchRoadData(location, radius = 1000) {
       }
       console.log("Road data received:", data);
 
-      // Ensure map is fully loaded before visualizing roads
-      map.on("load", () => {
-        visualizeRoads(data.features);
-      });
+      // After drawing the search area, visualize the roads last
+      visualizeRoads(data.features);
     })
     .catch((error) => console.error("Error fetching road data:", error));
 }
@@ -240,6 +238,7 @@ function visualizeRoads(features) {
         },
       });
 
+      // Add a layer to visualize the road
       map.addLayer({
         id: `road-layer-${index}`,
         type: "line",
