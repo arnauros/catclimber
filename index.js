@@ -217,6 +217,7 @@ function visualizeRoads(features) {
 
   // Iterate over the features returned by the Tilequery API
   features.forEach((feature, index) => {
+    console.log("Feature properties:", feature.properties);
     const roadClass = feature.properties.class;
 
     if (
@@ -258,6 +259,7 @@ function visualizeRoads(features) {
           geometry: feature.geometry,
         },
       });
+      console.log(`Added source for ${roadName}`); // <-- Add this log
 
       // Add the road layer, placing it above existing road layers
       map.addLayer(
@@ -361,6 +363,8 @@ function addSearchAreaToMap(coordinates, sourceId) {
 //          hardcoding a line
 //==========================================
 
+/*
+
 // Function to add a hardcoded road
 function addHardcodedRoad() {
   // Check if the map style has finished loading
@@ -413,3 +417,5 @@ function addHardcodedRoad() {
 
   console.log("Hardcoded road added successfully.");
 }
+
+*/
