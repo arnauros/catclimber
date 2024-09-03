@@ -201,36 +201,39 @@ function fetchRoadData(location, radius = 5000) {
 // Function to visualize roads on the map
 function visualizeRoads(features) {
   features.forEach((feature, index) => {
-    console.log(`Feature ${index + 1} properties:`, feature.properties); // Log the entire properties object
+    // Filter only the features that belong to the 'road' layer
+    if (feature.properties.layer === "road") {
+      const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
+      console.log(`Visualizing road: ${roadName}`);
 
-    const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
-    console.log(`Visualizing road: ${roadName}`);
+      // Add a source for the road
+      map.addSource(`road-source-${index}`, {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: feature.geometry,
+        },
+      });
 
-    // Add a source for the road
-    map.addSource(`road-source-${index}`, {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        properties: {},
-        geometry: feature.geometry,
-      },
-    });
+      map.addLayer({
+        id: `road-layer-${index}`,
+        type: "line",
+        source: `road-source-${index}`,
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#FF5733", // Customize the color as needed
+          "line-width": 4,
+        },
+      });
 
-    map.addLayer({
-      id: `road-layer-${index}`,
-      type: "line",
-      source: `road-source-${index}`,
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#FF5733", // Customize the color as needed
-        "line-width": 4,
-      },
-    });
-
-    console.log(`Added layer for road ${index + 1}: ${roadName}`);
+      console.log(`Added layer for road ${index + 1}: ${roadName}`);
+    } else {
+      console.log(`Skipping feature ${index + 1}: Not a road`);
+    }
   });
 }
 
