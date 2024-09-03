@@ -296,77 +296,77 @@ function visualizeRoads(features) {
       );
     }
   });
+}
 
-  // Function to draw the search area on the map
-  function drawSearchArea(location, radiusInMeters) {
-    const searchAreaSourceId = "search-area";
-    const searchAreaLayerId = "search-area-layer";
+// Function to draw the search area on the map
+function drawSearchArea(location, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
+  const searchAreaLayerId = "search-area-layer";
 
-    // Convert radius from meters to kilometers for the circle creation
-    const radiusInKm = radiusInMeters / 1000;
+  // Convert radius from meters to kilometers for the circle creation
+  const radiusInKm = radiusInMeters / 1000;
 
-    // Remove existing search area layer and source if they exist
-    removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
+  // Remove existing search area layer and source if they exist
+  removeExistingSearchArea(searchAreaSourceId, searchAreaLayerId);
 
-    // Create the circular polygon and add it to the map
-    const circlePolygon = createCirclePolygon(location, radiusInKm);
-    addSearchAreaToMap(circlePolygon, searchAreaSourceId);
+  // Create the circular polygon and add it to the map
+  const circlePolygon = createCirclePolygon(location, radiusInKm);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
+}
+
+// Function to remove existing search area layer and source from the map
+function removeExistingSearchArea(sourceId, layerId) {
+  if (map.getLayer(layerId)) {
+    map.removeLayer(layerId);
   }
-
-  // Function to remove existing search area layer and source from the map
-  function removeExistingSearchArea(sourceId, layerId) {
-    if (map.getLayer(layerId)) {
-      map.removeLayer(layerId);
-    }
-    if (map.getSource(sourceId)) {
-      map.removeSource(sourceId);
-    }
+  if (map.getSource(sourceId)) {
+    map.removeSource(sourceId);
   }
+}
 
-  // Function to create a circular polygon around a given point
-  function createCirclePolygon(center, radiusInKm, points = 64) {
-    const latitude = center[1];
-    const longitude = center[0];
-    const coordinates = [];
+// Function to create a circular polygon around a given point
+function createCirclePolygon(center, radiusInKm, points = 64) {
+  const latitude = center[1];
+  const longitude = center[0];
+  const coordinates = [];
 
-    const distanceX =
-      radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
-    const distanceY = radiusInKm / 110.574;
+  const distanceX =
+    radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  const distanceY = radiusInKm / 110.574;
 
-    for (let i = 0; i < points; i++) {
-      const theta = (i / points) * (2 * Math.PI);
-      const x = distanceX * Math.cos(theta);
-      const y = distanceY * Math.sin(theta);
-      coordinates.push([longitude + x, latitude + y]);
-    }
-    coordinates.push(coordinates[0]); // Close the polygon
-
-    return coordinates;
+  for (let i = 0; i < points; i++) {
+    const theta = (i / points) * (2 * Math.PI);
+    const x = distanceX * Math.cos(theta);
+    const y = distanceY * Math.sin(theta);
+    coordinates.push([longitude + x, latitude + y]);
   }
+  coordinates.push(coordinates[0]); // Close the polygon
 
-  // Function to add the search area polygon to the map
-  function addSearchAreaToMap(coordinates, sourceId) {
-    map.addSource(sourceId, {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [coordinates],
-        },
+  return coordinates;
+}
+
+// Function to add the search area polygon to the map
+function addSearchAreaToMap(coordinates, sourceId) {
+  map.addSource(sourceId, {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [coordinates],
       },
-    });
+    },
+  });
 
-    map.addLayer({
-      id: "search-area-layer",
-      type: "fill",
-      source: sourceId,
-      paint: {
-        "fill-color": "#FF5733",
-        "fill-opacity": 0.3,
-      },
-    });
+  map.addLayer({
+    id: "search-area-layer",
+    type: "fill",
+    source: sourceId,
+    paint: {
+      "fill-color": "#FF5733",
+      "fill-opacity": 0.3,
+    },
+  });
 
-    console.log("Search area layer added");
-  }
+  console.log("Search area layer added");
 }
