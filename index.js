@@ -273,6 +273,7 @@ function removeExistingSearchArea(sourceId, layerId) {
   }
 }
 
+/*
 // Function to create a circular polygon around a given point
 function createCirclePolygon(center, radiusInKm, points = 64) {
   const latitude = center[1];
@@ -293,6 +294,7 @@ function createCirclePolygon(center, radiusInKm, points = 64) {
 
   return coordinates;
 }
+*/
 
 // Function to add the search area polygon to the map
 function addSearchAreaToMap(coordinates, sourceId, layerId) {
