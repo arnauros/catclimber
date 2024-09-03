@@ -245,6 +245,7 @@ function visualizeRoads(features) {
         `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
           index + 1
         }`;
+      console.log("------------------");
       console.log(`Visualizing road: ${roadName}`);
       console.log("Feature coordinates:", feature.geometry.coordinates);
       console.log("Feature coordinates:", feature.geometry);
