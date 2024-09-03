@@ -216,7 +216,9 @@ function visualizeRoads(features) {
   });
 
   // Iterate over the features returned by the Tilequery API
-  features.forEach((feature, index) => {
+features.forEach((feature, index) => {
+  // Filter out features that do not have LineString geometry
+  if (feature.geometry.type === "LineString") {
     console.log("Feature properties:", feature.properties);
     const roadClass = feature.properties.class;
 
@@ -248,7 +250,6 @@ function visualizeRoads(features) {
       console.log("------------------");
       console.log(`Visualizing road: ${roadName}`);
       console.log("Feature coordinates:", feature.geometry.coordinates);
-      console.log("Feature coordinates:", feature.geometry);
 
       const sourceId = `road-source-${index}`;
       const layerId = `road-layer-${index}`;
@@ -288,8 +289,10 @@ function visualizeRoads(features) {
       console.log(`Skipping feature ${index + 1}: Not a road`);
       console.log("------------------");
     }
-  });
-}
+  } else {
+    console.log(`Skipping feature ${index + 1}: Not a LineString (found ${feature.geometry.type})`);
+  }
+});
 
 // Function to draw the search area on the map
 function drawSearchArea(location, radiusInMeters) {
