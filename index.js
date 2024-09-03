@@ -214,9 +214,17 @@ function visualizeRoads(features) {
         "service",
         "motorway",
         "path",
+        "unclassified",
       ].includes(feature.properties.class)
     ) {
-      const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
+      // Provide a more descriptive fallback name
+      const roadName =
+        feature.properties.name ||
+        `${
+          feature.properties.class.charAt(0).toUpperCase() +
+          feature.properties.class.slice(1)
+        } Road ${index + 1}`;
+
       console.log(`Visualizing road: ${roadName}`);
 
       // Add a source for the road
