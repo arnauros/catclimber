@@ -273,7 +273,7 @@ function drawSearchArea(location, radiusInMeters) {
 
   // Create the circular polygon and add it to the map
   const circlePolygon = createCirclePolygon(location, radiusInKm);
-  addSearchAreaToMap(circlePolygon, searchAreaSourceId, searchAreaLayerId);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
 
 // Function to remove existing search area layer and source from the map
@@ -308,7 +308,7 @@ function createCirclePolygon(center, radiusInKm, points = 64) {
 }
 
 // Function to add the search area polygon to the map
-function addSearchAreaToMap(coordinates, sourceId, layerId) {
+function addSearchAreaToMap(coordinates, sourceId) {
   map.addSource(sourceId, {
     type: "geojson",
     data: {
@@ -321,19 +321,14 @@ function addSearchAreaToMap(coordinates, sourceId, layerId) {
   });
 
   map.addLayer({
-    id: `road-layer-${index}`,
-    type: "line",
-    source: `road-source-${index}`,
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
-      visibility: "visible", // Ensure visibility is set
-    },
+    id: `search-area-layer`,
+    type: "fill",
+    source: sourceId,
     paint: {
-      "line-color": "#FF5733", // Customize the color as needed
-      "line-width": 4,
+      "fill-color": "#FF5733",
+      "fill-opacity": 0.3,
     },
   });
 
-  console.log(`Layer added: road-layer-${index}`);
+  console.log(`Search area layer added`);
 }
