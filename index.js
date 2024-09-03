@@ -196,6 +196,8 @@ function fetchRoadData(location, radius = 5000) {
 // Function to visualize roads on the map
 function visualizeRoads(features) {
   features.forEach((feature, index) => {
+    console.log(`Feature ${index + 1} properties:`, feature.properties); // Log the entire properties object
+
     const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
     console.log(`Visualizing road: ${roadName}`);
 
@@ -209,7 +211,6 @@ function visualizeRoads(features) {
       },
     });
 
-    // Add a layer to visualize the road
     map.addLayer({
       id: `road-layer-${index}`,
       type: "line",
@@ -224,8 +225,7 @@ function visualizeRoads(features) {
       },
     });
 
-    // Log if the layer is added successfully
-    console.log(`Added layer for road ${index + 1}: updated ${roadName}`);
+    console.log(`Added layer for road ${index + 1}: ${roadName}`);
   });
 }
 
