@@ -172,16 +172,12 @@ function setupGeolocation() {
   });
 }
 
-// Function to fetch road data using the Mapbox API and visualize the roads
+// Function to fetch road data using the Mapbox API and visualize the search area
 function fetchRoadData(location, radius = 1000) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
 
-  console.log(
-    "Fetching road data for location:",
-    location,
-    "with radius:",
-    radius
-  );
+  // Draw the search area on the map as a circle
+  drawSearchArea(location, radius);
 
   fetch(url)
     .then((response) => response.json())
@@ -191,27 +187,35 @@ function fetchRoadData(location, radius = 1000) {
         return;
       }
       console.log("Road data received:", data);
-      console.log("Number of features:", data.features.length);
 
-      // Visualize the roads
+      // After drawing the search area, visualize the roads last
       visualizeRoads(data.features);
     })
     .catch((error) => console.error("Error fetching road data:", error));
 }
 
+//==========================================
+//          visualizing roads
+//==========================================
+
 // Function to visualize roads on the map
 function visualizeRoads(features) {
-  // Remove existing road layer if it exists
-  if (map.getLayer("roads")) {
-    map.removeLayer("roads");
-  }
-  if (map.getSource("roads")) {
-    map.removeSource("roads");
-  }
+  // Remove existing road layers
+  map.getStyle().layers.forEach((layer) => {
+    if (layer.id.startsWith("road-layer-")) {
+      map.removeLayer(layer.id);
+    }
+  });
 
-  // Filter features to include only roads
-  const roadFeatures = features.filter(
-    (feature) =>
+  // Remove existing road sources
+  Object.keys(map.getStyle().sources).forEach((source) => {
+    if (source.startsWith("road-source-")) {
+      map.removeSource(source);
+    }
+  });
+
+  features.forEach((feature, index) => {
+    if (
       feature.properties.class &&
       [
         "street",
@@ -226,35 +230,47 @@ function visualizeRoads(features) {
         "path",
         "unclassified",
       ].includes(feature.properties.class)
-  );
+    ) {
+      const roadName =
+        feature.properties.name ||
+        `${
+          feature.properties.class.charAt(0).toUpperCase() +
+          feature.properties.class.slice(1)
+        } Road ${index + 1}`;
 
-  console.log(`Visualizing ${roadFeatures.length} roads`);
+      console.log(`Visualizing road: ${roadName}`);
 
-  // Add a new source with all road features
-  map.addSource("roads", {
-    type: "geojson",
-    data: {
-      type: "FeatureCollection",
-      features: roadFeatures,
-    },
+      const sourceId = `road-source-${index}`;
+      const layerId = `road-layer-${index}`;
+
+      map.addSource(sourceId, {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: feature.geometry,
+        },
+      });
+
+      map.addLayer({
+        id: layerId,
+        type: "line",
+        source: sourceId,
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#FF5733",
+          "line-width": 4,
+        },
+      });
+
+      console.log(`Added layer for road ${index + 1}: ${roadName}`);
+    } else {
+      console.log(`Skipping feature ${index + 1}: Not a road`);
+    }
   });
-
-  // Add a new layer to display the roads
-  map.addLayer({
-    id: "roads",
-    type: "line",
-    source: "roads",
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
-    },
-    paint: {
-      "line-color": "#FF5733",
-      "line-width": 4,
-    },
-  });
-
-  console.log("Roads layer added to the map");
 }
 
 // Function to draw the search area on the map
