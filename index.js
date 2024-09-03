@@ -308,7 +308,7 @@ function createCirclePolygon(center, radiusInKm, points = 64) {
 }
 
 // Function to add the search area polygon to the map
-function addSearchAreaToMap(coordinates, sourceId) {
+function addSearchAreaToMap(coordinates, sourceId, index) {
   map.addSource(sourceId, {
     type: "geojson",
     data: {
