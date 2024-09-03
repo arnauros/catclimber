@@ -211,6 +211,10 @@ function visualizeRoads(features) {
         "tertiary",
         "residential",
         "road",
+        "track",
+        "service",
+        "motorway",
+        "path",
       ].includes(feature.properties.class)
     ) {
       const roadName = feature.properties.name || `Unnamed Road ${index + 1}`;
