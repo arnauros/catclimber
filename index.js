@@ -154,7 +154,7 @@ function setupGeolocation() {
 }
 
 // Function to fetch road data using the Mapbox API and visualize the search area
-function fetchRoadData(location, radius = 1000) {
+function fetchRoadData(location, radius = 500) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
 
   drawSearchArea(location, radius); // Draw the search area on the map as a circle
