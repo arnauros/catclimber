@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     locateUser(); // Call the function to locate the user after map is loaded
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
-    addHardcodedRoad(); // Add this line to call the new function
+    // addHardcodedRoad(); // Add this line to call the new function
   });
 });
 
