@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     locateUser(); // Call the function to locate the user after map is loaded
     setupSearch(); // Call the function to setup the search functionality
     setupGeolocation(); // Set up geolocation functionality
+    addHardcodedRoad(); // Add this line to call the new function
   });
 });
 
@@ -412,14 +413,3 @@ function addHardcodedRoad() {
 
   console.log("Hardcoded road added successfully.");
 }
-
-// Modify your existing code to call addHardcodedRoad after the map loads
-document.addEventListener("DOMContentLoaded", function () {
-  initializeMap();
-  map.on("load", () => {
-    locateUser();
-    setupSearch();
-    setupGeolocation();
-    addHardcodedRoad(); // Add this line to call the new function
-  });
-});
