@@ -261,28 +261,6 @@ function visualizeRoads(features) {
       });
       console.log(`Added source for ${roadName}`); // <-- Add this log
 
-      map.addLayer({
-        id: "test-line",
-        type: "line",
-        source: {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            geometry: {
-              type: "LineString",
-              coordinates: [
-                [2.154007, 41.390205], // Start (Barcelona)
-                [2.164007, 41.400205], // End (slightly northeast)
-              ],
-            },
-          },
-        },
-        paint: {
-          "line-color": "#FF0000",
-          "line-width": 4,
-        },
-      });
-
       // Add the road layer, placing it above existing road layers
       map.addLayer(
         {
