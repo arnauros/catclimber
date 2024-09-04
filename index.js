@@ -236,14 +236,14 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
       [
         "in",
         "class",
-        "primary",
+        "primary", // Road primary
         "secondary",
-        "tertiary",
-        "street_limited",
-        "street",
-        "major_road_link",
-        "secondary_tertiary_case",
-        "street_case",
+        "tertiary", // Road secondary tertiary
+        "street_limited", // Road street low
+        "street", // Road street
+        "major_road_link", // Road major link
+        "secondary_tertiary_case", // Road secondary tertiary case
+        "street_case", // Road street case
       ],
     ],
   });
@@ -256,10 +256,10 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
       });
 
       const roadNames = new Set(); // Using Set to avoid duplicates
-      const filteredRoads = [];
+      const filteredRoadIds = []; // Store road IDs for filtering
 
       features.forEach((feature) => {
-        if (feature.geometry.type === "LineString") {
+        if (feature.geometry.type === "LineString" && feature.id) {
           // Check each coordinate of the LineString and calculate the distance
           feature.geometry.coordinates.forEach((coord) => {
             const roadLngLat = new mapboxgl.LngLat(coord[0], coord[1]);
@@ -270,24 +270,26 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
             if (distanceFromCenter <= radiusInMeters) {
               const roadName = feature.properties.name || "Unnamed Road";
               roadNames.add(roadName);
-              filteredRoads.push(feature);
-              return; // Once we find one point in the road within radius, we stop checking further for this road
+              filteredRoadIds.push(feature.id); // Add the feature id for filtering
+              return; // Stop checking further points in the road once it's within the radius
             }
           });
         }
       });
 
-      // Display road names in the console
+      // Display road names in console
       console.log("Roads within the search area:");
       roadNames.forEach((name) => {
         console.log(name);
       });
 
-      // Optionally, reapply the filter to only show the filtered roads within the radius
-      const filteredRoadIds = filteredRoads.map((road) => road.id);
-      map.setFilter("custom-roads", ["in", "id", ...filteredRoadIds]);
-
-      console.log("Custom road layer updated with roads inside the radius");
+      // Apply the filter only if there are valid road IDs
+      if (filteredRoadIds.length > 0) {
+        map.setFilter("custom-roads", ["in", "id", ...filteredRoadIds]);
+        console.log("Custom road layer updated with roads inside the radius");
+      } else {
+        console.log("No roads found within the radius");
+      }
     }
   });
 }
