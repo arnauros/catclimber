@@ -200,7 +200,7 @@ function searchLocation(query) {
 //          Add The Road Layer
 // ======================================
 
-function addCustomRoadLayer(center) {
+function addCustomRoadLayer(center, radiusInMeters = 1000) {
   console.log("Adding custom road layer", center);
   if (map.getLayer("custom-roads")) {
     console.log("Removing existing custom road layer");
