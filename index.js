@@ -39,6 +39,38 @@ function initializeMap() {
   });
 }
 
+// Function to automatically locate the user on page load
+function locateUser() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const userCoordinates = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
+        map.flyTo({
+          center: userCoordinates,
+          zoom: 12, // Adjust zoom level as needed
+        });
+
+        // Add a marker at the user's location
+        new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+
+        // Fetch and display data around the user's location
+        fetchRoadData(userCoordinates);
+      },
+      function (error) {
+        console.error("Error getting geolocation:", error);
+        // Fallback to default location (Barcelona) if geolocation fails
+        fetchRoadData(defaultLocation);
+      }
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+    fetchRoadData(defaultLocation); // Fallback to Barcelona if geolocation isn't available
+  }
+}
+
 // Function to fetch road data using the Mapbox Streets vector tiles API
 function fetchRoadData(location, radius = 1000) {
   const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
