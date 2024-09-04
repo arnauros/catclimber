@@ -235,6 +235,7 @@ function addCustomRoadLayer(center) {
         "secondary",
         "tertiary",
         "residential",
+        "motorway",
         "service",
         "street",
       ],
