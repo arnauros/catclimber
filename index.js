@@ -13,6 +13,7 @@ let map; // Declare map variable globally so it can be accessed by other functio
 document.addEventListener("DOMContentLoaded", function () {
   initializeMap(); // Call the function to initialize the map
   map.on("load", () => {
+    console.log("Map has loaded successfully.");
     setupGeolocation(); // Set up geolocation functionality
     setupSearch(); // Set up search functionality
   });
@@ -33,6 +34,8 @@ function initializeMap() {
     center: defaultLocation, // Default center location
     zoom: 10, // Default zoom level
   });
+
+  console.log("Map initialized with center at:", defaultLocation);
 }
 
 // Function to automatically locate the user on page load
@@ -48,23 +51,22 @@ function locateUser() {
           center: userCoordinates,
           zoom: 12, // Adjust zoom level as needed
         });
+        console.log("User location found:", userCoordinates);
+
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
         addCustomRoadLayer(userCoordinates);
-        drawSearchArea(userCoordinates, 1000); // Add the search area circle
       },
       function (error) {
         console.error("Error getting geolocation:", error);
         // Fallback to default location (Barcelona) if geolocation fails
         map.flyTo({ center: defaultLocation, zoom: 12 });
         addCustomRoadLayer(defaultLocation);
-        drawSearchArea(defaultLocation, 1000); // Add the search area circle for default location
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
     map.flyTo({ center: defaultLocation, zoom: 12 });
     addCustomRoadLayer(defaultLocation);
-    drawSearchArea(defaultLocation, 1000); // Add the search area circle for default location
   }
 }
 
@@ -100,8 +102,12 @@ function searchLocation(query) {
           zoom: 12,
         });
 
+        console.log(
+          `Location found for search query: ${placeName}`,
+          coordinates
+        );
+
         addCustomRoadLayer(coordinates);
-        drawSearchArea(coordinates, 1000); // Add the search area circle
       } else {
         alert("Location not found");
       }
@@ -152,7 +158,6 @@ function addCustomRoadLayer(center) {
       "line-width": 2,
       "line-opacity": 0.6,
     },
-    // Optionally filter by road class as before
     filter: [
       "in",
       "class",
@@ -176,7 +181,6 @@ function addCustomRoadLayer(center) {
 
   console.log("Custom road layer added.");
 }
-
 // Function to create a circular polygon around a given point
 function createCirclePolygon(center, radiusInKm, points = 64) {
   const latitude = center[1];
