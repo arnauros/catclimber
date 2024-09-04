@@ -40,7 +40,6 @@ function initializeMap() {
       setupGeolocation();
       setupSearch();
       addCustomRoadLayer(defaultLocation); // Add this line
-      locateUser();
     });
   } catch (error) {
     console.error("Error initializing map:", error);
@@ -67,12 +66,21 @@ function locateUser() {
       },
       function (error) {
         console.error("Geolocation error:", error);
+        alert("Unable to retrieve your location. Using default location.");
         map.flyTo({ center: defaultLocation, zoom: 12 });
         addCustomRoadLayer(defaultLocation);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
       }
     );
   } else {
     console.error("Geolocation is not supported");
+    alert(
+      "Geolocation is not supported by your browser. Using default location."
+    );
     map.flyTo({ center: defaultLocation, zoom: 12 });
     addCustomRoadLayer(defaultLocation);
   }
