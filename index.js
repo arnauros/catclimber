@@ -118,20 +118,25 @@ function setupGeolocation() {
 
 // Function to add a custom road layer
 function addCustomRoadLayer(center) {
+  if (!map.isStyleLoaded()) {
+    console.error("Map style not fully loaded yet.");
+    return;
+  }
+
   map.addLayer({
     id: "custom-roads",
     type: "line",
     source: {
       type: "vector",
-      url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
+      url: "mapbox://mapbox.mapbox-streets-v8", // Ensure this is correct
     },
-    "source-layer": "road", // Specify the source layer
+    "source-layer": "road", // Ensure the source layer name is correct
     layout: {
       "line-join": "round",
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000", // Customize color as needed
+      "line-color": "#FF0000",
       "line-width": 2,
       "line-opacity": 0.6,
     },
