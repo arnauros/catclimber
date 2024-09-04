@@ -202,6 +202,7 @@ function searchLocation(query) {
 
 function addCustomRoadLayer(center, radiusInMeters = 1000) {
   console.log("Adding custom road layer", center);
+
   if (map.getLayer("custom-roads")) {
     console.log("Removing existing custom road layer");
     map.removeLayer("custom-roads");
@@ -235,54 +236,60 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
       [
         "in",
         "class",
-        "primary", // Road primary
+        "primary",
         "secondary",
-        "tertiary", // Road secondary tertiary
-        "street_limited", // Road street low
-        "street", // Road street
-        "major_road_link", // Road major link
-        "secondary_tertiary_case", // Road secondary tertiary case
-        "street_case", // Road street case
+        "tertiary",
+        "street_limited",
+        "street",
+        "major_road_link",
+        "secondary_tertiary_case",
+        "street_case",
       ],
-      // ["in", "surface", "paved", "asphalt", "concrete"],
     ],
   });
-  // Query for roads within the viewport and log the names
-  map.on("idle", () => {
-    const features = map.queryRenderedFeatures({
-      layers: ["custom-roads"],
-    });
 
-    const roadNames = new Set(); // Using Set to avoid duplicates
+  // Query all road features from the source and filter by distance
+  map.on("sourcedata", () => {
+    if (map.isSourceLoaded("custom-roads")) {
+      const features = map.querySourceFeatures("custom-roads", {
+        sourceLayer: "road",
+      });
 
-    features.forEach((feature) => {
-      const roadCoordinates = feature.geometry.coordinates;
+      const roadNames = new Set(); // Using Set to avoid duplicates
+      const filteredRoads = [];
 
-      // For LineString geometries
-      if (feature.geometry.type === "LineString") {
-        const roadLngLat = new mapboxgl.LngLat(
-          roadCoordinates[0][0], // Longitude
-          roadCoordinates[0][1] // Latitude
-        );
+      features.forEach((feature) => {
+        if (feature.geometry.type === "LineString") {
+          // Check each coordinate of the LineString and calculate the distance
+          feature.geometry.coordinates.forEach((coord) => {
+            const roadLngLat = new mapboxgl.LngLat(coord[0], coord[1]);
+            const distanceFromCenter = roadLngLat.distanceTo(
+              new mapboxgl.LngLat(center[0], center[1])
+            );
 
-        const distanceFromCenter = roadLngLat.distanceTo(
-          new mapboxgl.LngLat(center[0], center[1])
-        );
-
-        if (distanceFromCenter <= radiusInMeters) {
-          const roadName = feature.properties.name || "Unnamed Road";
-          roadNames.add(roadName);
+            if (distanceFromCenter <= radiusInMeters) {
+              const roadName = feature.properties.name || "Unnamed Road";
+              roadNames.add(roadName);
+              filteredRoads.push(feature);
+              return; // Once we find one point in the road within radius, we stop checking further for this road
+            }
+          });
         }
-      }
-    });
-    // Display road names in console
-    console.log("Roads within the search area:");
-    roadNames.forEach((name) => {
-      console.log(name);
-    });
-  });
+      });
 
-  console.log("Custom road layer added");
+      // Display road names in the console
+      console.log("Roads within the search area:");
+      roadNames.forEach((name) => {
+        console.log(name);
+      });
+
+      // Optionally, reapply the filter to only show the filtered roads within the radius
+      const filteredRoadIds = filteredRoads.map((road) => road.id);
+      map.setFilter("custom-roads", ["in", "id", ...filteredRoadIds]);
+
+      console.log("Custom road layer updated with roads inside the radius");
+    }
+  });
 }
 
 // Function to create a circular polygon around a given point
