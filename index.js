@@ -222,7 +222,7 @@ function addCustomRoadLayer(center) {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#bfb3b0",
+      "line-color": "#000000",
       "line-width": 2,
       "line-opacity": 0.6,
     },
