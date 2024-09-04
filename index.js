@@ -331,11 +331,19 @@ function addSearchAreaToMap(coordinates, sourceId) {
     paint: {
       "fill-color": "#FF5733",
       "fill-opacity": 0.05,
-      "border-color": "#FF5733",
-      "border-width": 2,
     },
   });
 
+  // Add a line layer for the border
+  map.addLayer({
+    id: "search-area-border",
+    type: "line",
+    source: sourceId,
+    paint: {
+      "line-color": "#FF5733", // Same color as your fill border
+      "line-width": 2, // Adjust the width of the border
+    },
+  });
   console.log("Search area layer added");
 }
 
