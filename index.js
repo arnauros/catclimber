@@ -330,7 +330,8 @@ function addSearchAreaToMap(coordinates, sourceId) {
     source: sourceId,
     paint: {
       "fill-color": "#FF5733",
-      "fill-opacity": 0.3,
+      "fill-opacity": 0.05,
+      "border-color": "#FF5733",
     },
   });
 
