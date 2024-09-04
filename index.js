@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   map.on("load", () => {
     setupGeolocation(); // Set up geolocation functionality
     setupSearch(); // Set up search functionality
+    addCustomRoadLayer(defaultLocation); // Add custom road layer to the map
   });
 });
 
