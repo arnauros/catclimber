@@ -211,6 +211,3 @@ function addSearchAreaToMap(coordinates, sourceId) {
 
   console.log("Search area layer added");
 }
-
-console.log("Layers:", map.getStyle().layers);
-console.log("Sources:", map.getStyle().sources);
