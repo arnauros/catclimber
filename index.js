@@ -329,7 +329,7 @@ function addSearchAreaToMap(coordinates, sourceId) {
     type: "fill",
     source: sourceId,
     paint: {
-      "fill-color": "#FF5733",
+      "fill-color": "#ffffff",
       "fill-opacity": 0.05,
     },
   });
@@ -340,7 +340,7 @@ function addSearchAreaToMap(coordinates, sourceId) {
     type: "line",
     source: sourceId,
     paint: {
-      "line-color": "#FF5733", // Same color as your fill border
+      "line-color": "#ffffff", // Same color as your fill border
       "line-width": 2, // Adjust the width of the border
     },
   });
