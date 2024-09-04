@@ -39,51 +39,68 @@ function initializeMap() {
       console.log("Map has loaded successfully.");
       setupGeolocation();
       setupSearch();
-      addCustomRoadLayer(defaultLocation); // Add this line
+      addCustomRoadLayer(defaultLocation);
+      attemptUserLocation(); // New function to attempt geolocation on load
     });
   } catch (error) {
     console.error("Error initializing map:", error);
   }
 }
 
-function locateUser() {
-  console.log("Attempting to locate user");
+function attemptUserLocation() {
   if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        console.log("Geolocation successful");
-        const userCoordinates = [
-          position.coords.longitude,
-          position.coords.latitude,
-        ];
-        console.log("User coordinates:", userCoordinates);
-        map.flyTo({
-          center: userCoordinates,
-          zoom: 12,
-        });
-        new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
-        addCustomRoadLayer(userCoordinates);
-      },
-      function (error) {
-        console.error("Geolocation error:", error);
-        alert("Unable to retrieve your location. Using default location.");
-        map.flyTo({ center: defaultLocation, zoom: 12 });
-        addCustomRoadLayer(defaultLocation);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0,
-      }
-    );
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then(function (result) {
+        if (result.state === "granted") {
+          locateUser();
+        } else if (result.state === "prompt") {
+          // We can't automatically trigger the prompt, but we can inform the user
+          alert(
+            "Please use the geolocation button to share your location for a better experience."
+          );
+        } else if (result.state === "denied") {
+          console.log("Geolocation permission denied");
+          alert("Location access is denied. Using default location.");
+        }
+      });
   } else {
     console.error("Geolocation is not supported");
     alert(
       "Geolocation is not supported by your browser. Using default location."
     );
-    map.flyTo({ center: defaultLocation, zoom: 12 });
-    addCustomRoadLayer(defaultLocation);
   }
+}
+
+function locateUser() {
+  console.log("Attempting to locate user");
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      console.log("Geolocation successful");
+      const userCoordinates = [
+        position.coords.longitude,
+        position.coords.latitude,
+      ];
+      console.log("User coordinates:", userCoordinates);
+      map.flyTo({
+        center: userCoordinates,
+        zoom: 12,
+      });
+      new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+      addCustomRoadLayer(userCoordinates);
+    },
+    function (error) {
+      console.error("Geolocation error:", error);
+      alert("Unable to retrieve your location. Using default location.");
+      map.flyTo({ center: defaultLocation, zoom: 12 });
+      addCustomRoadLayer(defaultLocation);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    }
+  );
 }
 
 function setupSearch() {
