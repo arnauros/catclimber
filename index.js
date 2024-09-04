@@ -24,29 +24,29 @@ function initializeMap() {
     console.error("Mapbox GL JS is not loaded.");
     return;
   }
-} // Add the closing curly brace here
 
-console.log("Mapbox GL JS is loaded");
-mapboxgl.accessToken = mapboxToken;
+  console.log("Mapbox GL JS is loaded");
+  mapboxgl.accessToken = mapboxToken;
 
-try {
-  map = new mapboxgl.Map({
-    container: mapContainerId,
-    style: "mapbox://styles/mapbox/outdoors-v11",
-    center: defaultLocation,
-    zoom: 10,
-  });
-  console.log("Map object created");
+  try {
+    map = new mapboxgl.Map({
+      container: mapContainerId,
+      style: "mapbox://styles/mapbox/outdoors-v11",
+      center: defaultLocation,
+      zoom: 10,
+    });
+    console.log("Map object created");
 
-  map.on("load", () => {
-    console.log("Map has loaded successfully.");
-    setupGeolocation();
-    setupSearch();
-    addCustomRoadLayer(defaultLocation);
-    attemptUserLocation(); // New function to attempt geolocation on load
-  });
-} catch (error) {
-  console.error("Error initializing map:", error);
+    map.on("load", () => {
+      console.log("Map has loaded successfully.");
+      setupGeolocation();
+      setupSearch();
+      addCustomRoadLayer(defaultLocation);
+      attemptUserLocation(); // New function to attempt geolocation on load
+    });
+  } catch (error) {
+    console.error("Error initializing map:", error);
+  }
 }
 
 // ======================================
@@ -261,6 +261,7 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
     });
 
     console.log(`Found ${features.length} road features in the source.`);
+
     const roadNames = new Set(); // To store unique road names
 
     features.forEach((feature) => {
@@ -274,109 +275,107 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
           new mapboxgl.LngLat(center[0], center[1])
         );
 
+        console.log(
+          `Checking road feature at ${roadCoordinates}: Distance from center is ${distanceFromCenter} meters.`
+        );
+
         // Only include roads within the specified radius
         if (distanceFromCenter <= radiusInMeters) {
           const roadName = feature.properties.name;
           if (roadName) {
-            roadNames.add({
-              name: roadName,
-              distance: distanceFromCenter.toFixed(2),
-            });
+            roadNames.add(roadName);
           }
         }
       }
     });
 
-    // Display road names in the 'streetName' element and distances in 'roadDiv'
-    const roadDiv = document.getElementById("roadDiv");
-    const streetName = document.getElementById("streetName");
-    roadDiv.innerHTML = ""; // Clear previous distances
-    streetName.innerHTML = ""; // Clear previous road names
-
-    roadNames.forEach((road) => {
-      const roadInfo = `${road.distance}m`; // Road distance
-      const streetInfo = `${road.name}`; // Street name
-
-      // Append the road info to the respective divs
-      roadDiv.innerHTML += `<p>${roadInfo}</p>`;
-      streetName.innerHTML += `<p>${streetInfo}</p>`;
-    });
-
-    //=======================================================
-    // Function to create a circular polygon around a given point
-    //=======================================================
-
-    // Function to create a circular polygon around a given point
-    function createCirclePolygon(center, radiusInKm, points = 64) {
-      const latitude = center[1];
-      const longitude = center[0];
-      const coordinates = [];
-
-      const distanceX =
-        radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
-      const distanceY = radiusInKm / 110.574;
-
-      for (let i = 0; i < points; i++) {
-        const theta = (i / points) * (2 * Math.PI);
-        const x = distanceX * Math.cos(theta);
-        const y = distanceY * Math.sin(theta);
-        coordinates.push([longitude + x, latitude + y]);
-      }
-      coordinates.push(coordinates[0]); // Close the polygon
-
-      return coordinates;
-    }
-
-    // Function to add the search area polygon to the map
-    function addSearchAreaToMap(coordinates, sourceId) {
-      if (map.getLayer("search-area-layer")) {
-        map.removeLayer("search-area-layer");
-      }
-      if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-      }
-
-      map.addSource(sourceId, {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [coordinates],
-          },
-        },
+    // Display road names in console
+    if (roadNames.size > 0) {
+      console.log("Roads within the search area:");
+      roadNames.forEach((name) => {
+        console.log(name);
       });
-
-      map.addLayer({
-        id: "search-area-layer",
-        type: "fill",
-        source: sourceId,
-        paint: {
-          "fill-color": "#ffffff",
-          "fill-opacity": 0.05,
-        },
-      });
-
-      // Add a line layer for the border
-      map.addLayer({
-        id: "search-area-border",
-        type: "line",
-        source: sourceId,
-        paint: {
-          "line-color": "#ffffff", // Same color as your fill border
-          "line-width": 2, // Adjust the width of the border
-        },
-      });
-      console.log("Search area layer added");
-    }
-
-    // Function to draw the search area on the map
-    function drawSearchArea(center, radiusInMeters) {
-      const searchAreaSourceId = "search-area";
-      const radiusInKm = radiusInMeters / 1000;
-
-      const circlePolygon = createCirclePolygon(center, radiusInKm);
-      addSearchAreaToMap(circlePolygon, searchAreaSourceId);
+    } else {
+      console.log("No roads found within the radius");
     }
   });
+
+  console.log("Custom road layer added");
+}
+
+//=======================================================
+// Function to create a circular polygon around a given point
+//=======================================================
+
+// Function to create a circular polygon around a given point
+function createCirclePolygon(center, radiusInKm, points = 64) {
+  const latitude = center[1];
+  const longitude = center[0];
+  const coordinates = [];
+
+  const distanceX =
+    radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  const distanceY = radiusInKm / 110.574;
+
+  for (let i = 0; i < points; i++) {
+    const theta = (i / points) * (2 * Math.PI);
+    const x = distanceX * Math.cos(theta);
+    const y = distanceY * Math.sin(theta);
+    coordinates.push([longitude + x, latitude + y]);
+  }
+  coordinates.push(coordinates[0]); // Close the polygon
+
+  return coordinates;
+}
+
+// Function to add the search area polygon to the map
+function addSearchAreaToMap(coordinates, sourceId) {
+  if (map.getLayer("search-area-layer")) {
+    map.removeLayer("search-area-layer");
+  }
+  if (map.getSource(sourceId)) {
+    map.removeSource(sourceId);
+  }
+
+  map.addSource(sourceId, {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [coordinates],
+      },
+    },
+  });
+
+  map.addLayer({
+    id: "search-area-layer",
+    type: "fill",
+    source: sourceId,
+    paint: {
+      "fill-color": "#ffffff",
+      "fill-opacity": 0.05,
+    },
+  });
+
+  // Add a line layer for the border
+  map.addLayer({
+    id: "search-area-border",
+    type: "line",
+    source: sourceId,
+    paint: {
+      "line-color": "#ffffff", // Same color as your fill border
+      "line-width": 2, // Adjust the width of the border
+    },
+  });
+  console.log("Search area layer added");
+}
+
+// Function to draw the search area on the map
+function drawSearchArea(center, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
+  const radiusInKm = radiusInMeters / 1000;
+
+  const circlePolygon = createCirclePolygon(center, radiusInKm);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
