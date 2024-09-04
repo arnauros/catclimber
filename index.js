@@ -231,15 +231,16 @@ function addCustomRoadLayer(center) {
       [
         "in",
         "class",
+        "street",
         "primary",
         "secondary",
         "tertiary",
         "residential",
+        "road",
         "motorway",
         "service",
-        "street",
       ],
-      ["==", "surface", "paved"], // Only roads with paved surface
+      ["in", "surface", "paved", "asphalt", "concrete"], // Only roads with paved surface
     ],
   });
   console.log("Custom road layer added");
