@@ -56,127 +56,177 @@ function locateUser() {
         // Add a marker at the user's location
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
 
-        // Fetch and display data around the user's location
-        fetchRoadData(userCoordinates);
+        // Visualize roads at user's location
+        addCustomRoadLayer(userCoordinates);
       },
       function (error) {
         console.error("Error getting geolocation:", error);
         // Fallback to default location (Barcelona) if geolocation fails
-        fetchRoadData(defaultLocation);
+        map.flyTo({
+          center: defaultLocation,
+          zoom: 12, // Adjust zoom level as needed
+        });
+
+        // Visualize roads at default location
+        addCustomRoadLayer(defaultLocation);
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
-    fetchRoadData(defaultLocation); // Fallback to Barcelona if geolocation isn't available
+    map.flyTo({
+      center: defaultLocation,
+      zoom: 12, // Adjust zoom level as needed
+    });
+
+    // Visualize roads at default location
+    addCustomRoadLayer(defaultLocation);
   }
 }
 
-// Function to fetch road data using the Mapbox Streets vector tiles API
-function fetchRoadData(location, radius = 1000) {
-  const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${location[0]},${location[1]}.json?radius=${radius}&limit=50&dedupe&geometry=linestring&access_token=${mapboxToken}`;
+// Function to set up search functionality
+function setupSearch() {
+  // Prevent form submission
+  const form = document.querySelector("form");
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent form submission
+    });
+  }
 
-  // Draw the search area on the map as a circle
-  drawSearchArea(location, radius);
-
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message) {
-        console.error("Error in API response:", data.message);
-        return;
+  // Set up the search button click event
+  document
+    .getElementById("searchButton")
+    .addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission behavior
+      const query = document.getElementById("searchLocate").value;
+      if (query) {
+        searchLocation(query);
+      } else {
+        alert("Please enter a location to search");
       }
-      console.log("Road data received:", data);
+    });
 
-      // After drawing the search area, visualize the roads last
-      visualizeRoads(data.features);
-    })
-    .catch((error) => console.error("Error fetching road data:", error));
+  // Set up 'Enter' key press event on the input field
+  document
+    .getElementById("searchLocate")
+    .addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault(); // Prevent the default form submission behavior
+        const query = e.target.value;
+        if (query) {
+          searchLocation(query);
+        } else {
+          alert("Please enter a location to search");
+        }
+      }
+    });
 }
 
-//==========================================
-//          Visualizing Roads
-//==========================================
+// Function to search for a location using the Mapbox Geocoding API
+function searchLocation(query) {
+  const geocodingUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+    query
+  )}.json?access_token=${mapboxToken}`;
 
-// Function to visualize only paved roads on the map
-function visualizeRoads(features) {
-  // Remove existing road layers
-  map.getStyle().layers.forEach((layer) => {
-    if (layer.id.startsWith("road-layer-")) {
-      map.removeLayer(layer.id);
-    }
-  });
+  fetch(geocodingUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.features.length > 0) {
+        const coordinates = data.features[0].center;
+        const placeName = data.features[0].place_name; // Get the place name (including road name)
 
-  // Remove existing road sources
-  Object.keys(map.getStyle().sources).forEach((source) => {
-    if (source.startsWith("road-source-")) {
-      map.removeSource(source);
-    }
-  });
+        console.log(`Found location: ${placeName}`);
 
-  // Iterate over the features returned by the Tilequery API
-  features.forEach((feature, index) => {
-    // Filter out features that do not have LineString geometry
-    if (feature.geometry.type === "LineString") {
-      const roadClass = feature.properties.class;
-      const surfaceType = feature.properties.surface;
-
-      // Check if the surface is paved
-      if (surfaceType === "paved" && roadClass) {
-        const roadName =
-          feature.properties.name ||
-          `${roadClass.charAt(0).toUpperCase() + roadClass.slice(1)} Road ${
-            index + 1
-          }`;
-        console.log("------------------");
-        console.log(`Visualizing road: ${roadName} (Surface: ${surfaceType})`);
-        console.log("Feature coordinates:", feature.geometry.coordinates);
-
-        const sourceId = `road-source-${index}`;
-        const layerId = `road-layer-${index}`;
-
-        // Add the source for the road feature
-        map.addSource(sourceId, {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            properties: {},
-            geometry: feature.geometry,
-          },
+        map.flyTo({
+          center: coordinates,
+          zoom: 12, // Adjust zoom level as needed
         });
-        console.log(`Added source for ${roadName}`); // <-- Add this log
 
-        // Add the road layer, placing it above existing road layers
-        map.addLayer(
-          {
-            id: layerId,
-            type: "line",
-            source: sourceId,
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#FF0000", // Customize color as needed
-              "line-width": 4,
-            },
-          },
-          undefined // Place this layer on top of all others
-        );
-
-        console.log(`Added layer for road ${index + 1}: ${roadName}`);
-        console.log("------------------");
+        // Visualize roads at searched location
+        addCustomRoadLayer(coordinates);
       } else {
-        console.log(`Skipping feature ${index + 1}: Not a paved road`);
-        console.log("------------------");
+        alert("Location not found");
       }
-    } else {
-      console.log(
-        `Skipping feature ${index + 1}: Not a LineString (found ${
-          feature.geometry.type
-        })`
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
+// Function to set up geolocation functionality
+function setupGeolocation() {
+  const geolocateButton = document.getElementById("geolocateButton");
+
+  geolocateButton.addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent any default behavior, such as form submission
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const userCoordinates = [
+            position.coords.longitude,
+            position.coords.latitude,
+          ];
+          map.flyTo({
+            center: userCoordinates,
+            zoom: 12, // Adjust zoom level as needed
+          });
+
+          // Add a marker at the user's location
+          new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+
+          // Visualize roads at user's location
+          addCustomRoadLayer(userCoordinates);
+        },
+        function (error) {
+          console.error("Error getting geolocation:", error);
+          alert("Unable to retrieve your location.");
+        }
       );
+    } else {
+      alert("Geolocation is not supported by your browser.");
     }
   });
+}
+
+// Function to add a custom road layer
+function addCustomRoadLayer(center) {
+  map.addLayer({
+    id: "custom-roads",
+    type: "line",
+    source: {
+      type: "vector",
+      url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
+    },
+    "source-layer": "road", // Specify the source layer
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "#FF0000", // Customize color as needed
+      "line-width": 2,
+    },
+    filter: [
+      "in",
+      "class",
+      "street",
+      "primary",
+      "secondary",
+      "tertiary",
+      "residential",
+      "road",
+      "track",
+      "service",
+      "motorway",
+      "path",
+      "unclassified",
+      "road-street-low",
+      "road-primary",
+      "road-secondary",
+      "road-street",
+    ], // Only show roads that match these classes
+  });
+
+  console.log("Custom road layer added");
 }
 
 // Function to draw the search area on the map
