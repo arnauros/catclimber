@@ -316,24 +316,14 @@ function createCirclePolygon(center, radiusInKm, points = 64) {
 }
 
 // Function to add the search area polygon to the map
-// Function to add the search area polygon to the map
 function addSearchAreaToMap(coordinates, sourceId) {
-  // Check if the search area border layer exists, and remove it before removing the source
-  if (map.getLayer("search-area-border")) {
-    map.removeLayer("search-area-border");
-  }
-
-  // Check if the search area layer exists, and remove it before removing the source
   if (map.getLayer("search-area-layer")) {
     map.removeLayer("search-area-layer");
   }
-
-  // Now, safely remove the source if it exists
   if (map.getSource(sourceId)) {
     map.removeSource(sourceId);
   }
 
-  // Add the source for the search area polygon
   map.addSource(sourceId, {
     type: "geojson",
     data: {
@@ -345,7 +335,6 @@ function addSearchAreaToMap(coordinates, sourceId) {
     },
   });
 
-  // Add the fill layer for the search area
   map.addLayer({
     id: "search-area-layer",
     type: "fill",
@@ -366,6 +355,14 @@ function addSearchAreaToMap(coordinates, sourceId) {
       "line-width": 2, // Adjust the width of the border
     },
   });
+  console.log("Search area layer added");
+}
 
-  console.log("Search area layer and border added");
+// Function to draw the search area on the map
+function drawSearchArea(center, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
+  const radiusInKm = radiusInMeters / 1000;
+
+  const circlePolygon = createCirclePolygon(center, radiusInKm);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
