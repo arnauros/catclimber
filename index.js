@@ -64,32 +64,24 @@ function attemptUserLocation() {
     navigator.permissions
       .query({ name: "geolocation" })
       .then(function (result) {
-        if (result.state === "granted" || result.state === "prompt") {
+        if (result.state === "granted") {
           locateUser();
-        } else {
-          fallbackToIPGeolocation();
+        } else if (result.state === "prompt") {
+          alert("Please allow access to your location when prompted.");
+          locateUser();
+        } else if (result.state === "denied") {
+          console.log("Geolocation permission denied");
+          alert(
+            "Location access is denied. Please enable location services in your browser settings."
+          );
         }
       });
   } else {
-    fallbackToIPGeolocation();
+    console.error("Geolocation is not supported");
+    alert(
+      "Geolocation is not supported by your browser. Using default location."
+    );
   }
-}
-
-function fallbackToIPGeolocation() {
-  console.log("Falling back to IP-based geolocation");
-  fetch("https://ipapi.co/json/")
-    .then((response) => response.json())
-    .then((data) => {
-      const ipBasedLocation = [data.longitude, data.latitude];
-      updateMapWithLocation(ipBasedLocation);
-      alert(
-        "Using approximate location based on your IP address. For more accurate results, please enable location services."
-      );
-    })
-    .catch((error) => {
-      console.error("IP geolocation failed:", error);
-      useDefaultLocation();
-    });
 }
 
 function locateUser() {
