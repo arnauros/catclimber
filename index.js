@@ -8,10 +8,9 @@ console.log("Script started");
 
 // Global Variables
 const mapContainerId = "map";
-const defaultLocation = [2.154007, 41.390205]; // Default location (Barcelona)
+const defaultLocation = [2.154007, 41.390205];
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ";
-const defaultRadius = 1000; // Default radius in meters
 let map;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initializeMap() {
   console.log("Initializing map");
-
   if (typeof mapboxgl === "undefined") {
     console.error("Mapbox GL JS is not loaded.");
     return;
@@ -33,16 +31,18 @@ function initializeMap() {
   try {
     map = new mapboxgl.Map({
       container: mapContainerId,
-      style: "mapbox://styles/mapbox/streets-v11", // You can change this style
+      style: "mapbox://styles/mapbox/outdoors-v11",
       center: defaultLocation,
       zoom: 10,
     });
+    console.log("Map object created");
 
     map.on("load", () => {
       console.log("Map has loaded successfully.");
       setupGeolocation();
       setupSearch();
-      attemptUserLocation(); // Try to get user's geolocation on load
+      addCustomRoadLayer(defaultLocation);
+      attemptUserLocation(); // New function to attempt geolocation on load
     });
   } catch (error) {
     console.error("Error initializing map:", error);
@@ -55,12 +55,11 @@ function initializeMap() {
 
 function setupGeolocation() {
   console.log("Setting up geolocation");
-
   const geolocateButton = document.getElementById("geolocateButton");
   if (geolocateButton) {
     geolocateButton.addEventListener("click", function (event) {
-      event.preventDefault();
       console.log("Geolocation button clicked");
+      event.preventDefault();
       attemptUserLocation();
     });
   } else {
@@ -90,7 +89,11 @@ function fallbackToIPGeolocation() {
     .then((response) => response.json())
     .then((data) => {
       const ipBasedLocation = [data.longitude, data.latitude];
-      updateMapWithLocation(ipBasedLocation, defaultRadius);
+      updateMapWithLocation(ipBasedLocation);
+      drawSearchArea(ipBasedLocation, 1000); // Draw radius for IP-based location
+      alert(
+        "Using approximate location based on your IP address. For more accurate results, please enable location services."
+      );
     })
     .catch((error) => {
       console.error("IP geolocation failed:", error);
@@ -108,7 +111,13 @@ function locateUser() {
         position.coords.latitude,
       ];
       console.log("User coordinates:", userCoordinates);
-      updateMapWithLocation(userCoordinates, defaultRadius);
+      map.flyTo({
+        center: userCoordinates,
+        zoom: 12,
+      });
+      new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
+      addCustomRoadLayer(userCoordinates);
+      drawSearchArea(userCoordinates, 1000); // Draw radius around the user's location
     },
     function (error) {
       console.error("Geolocation error:", error);
@@ -127,7 +136,9 @@ function locateUser() {
           errorMessage += "An unknown error occurred.";
       }
       alert(errorMessage + " Using default location.");
-      updateMapWithLocation(defaultLocation, defaultRadius);
+      map.flyTo({ center: defaultLocation, zoom: 12 });
+      addCustomRoadLayer(defaultLocation);
+      drawSearchArea(defaultLocation, 1000); // Draw radius for default location
     },
     {
       enableHighAccuracy: true,
@@ -139,10 +150,10 @@ function locateUser() {
 
 function setupSearch() {
   console.log("Setting up search");
-
   const searchButton = document.getElementById("searchButton");
   if (searchButton) {
     searchButton.addEventListener("click", function (event) {
+      console.log("Search button clicked");
       event.preventDefault();
       const query = document.getElementById("searchLocate").value;
       if (query) {
@@ -159,7 +170,6 @@ function setupSearch() {
 
 function searchLocation(query) {
   console.log("Searching for location:", query);
-
   const geocodingUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
   )}.json?access_token=${mapboxToken}`;
@@ -167,11 +177,17 @@ function searchLocation(query) {
   fetch(geocodingUrl)
     .then((response) => response.json())
     .then((data) => {
+      console.log("Geocoding API response received");
       if (data.features.length > 0) {
         const coordinates = data.features[0].center;
         const placeName = data.features[0].place_name;
         console.log("Location found:", placeName, coordinates);
-        updateMapWithLocation(coordinates, defaultRadius);
+        map.flyTo({
+          center: coordinates,
+          zoom: 12,
+        });
+        addCustomRoadLayer(coordinates);
+        drawSearchArea(coordinates, 1000); // Draw radius around searched location
       } else {
         console.log("Location not found");
         alert("Location not found");
@@ -181,26 +197,22 @@ function searchLocation(query) {
 }
 
 // ======================================
-//      Update Map and Display Roads
+//          Add The Road Layer
 // ======================================
 
-function updateMapWithLocation(coordinates, radiusInMeters) {
-  map.flyTo({ center: coordinates, zoom: 12 });
-  drawSearchArea(coordinates, radiusInMeters);
-  addCustomRoadLayer(coordinates, radiusInMeters);
-}
-
-// Function to add the custom road layer and query roads within the radius
+// Function to add the custom road layer and query all roads within the search radius
 function addCustomRoadLayer(center, radiusInMeters = 1000) {
-  console.log("Adding custom road layer around", center);
+  console.log("Adding custom road layer", center);
 
   // Remove existing custom road layer
   if (map.getLayer("custom-roads")) {
+    console.log("Removing existing custom road layer");
     map.removeLayer("custom-roads");
   }
 
   // Add the road source if it doesn't already exist
   if (!map.getSource("custom-roads")) {
+    console.log("Adding custom road source");
     map.addSource("custom-roads", {
       type: "vector",
       url: "mapbox://mapbox.mapbox-streets-v8", // Mapbox streets vector source
@@ -222,14 +234,33 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
       "line-width": 2,
       "line-opacity": 1,
     },
-    filter: ["in", "class", "primary", "secondary", "tertiary", "street"], // Filter by road class
+    filter: [
+      "all",
+      [
+        "in",
+        "class",
+        "primary", // Road primary
+        "secondary",
+        "tertiary", // Road secondary tertiary
+        "street_limited", // Road street low
+        "street", // Road street
+        "major_road_link", // Road major link
+        "secondary_tertiary_case", // Road secondary tertiary case
+        "street_case", // Road street case
+      ],
+    ],
   });
 
-  // Query roads within the radius
-  map.on("sourcedata", () => {
+  // Wait until the layer is fully loaded
+  map.on("idle", () => {
+    console.log("Map is idle, querying source features.");
+
+    // Use querySourceFeatures to get all features in the tile source
     const features = map.querySourceFeatures("custom-roads", {
       sourceLayer: "road",
     });
+
+    console.log(`Found ${features.length} road features in the source.`);
 
     const roadNames = new Set(); // To store unique road names
 
@@ -244,6 +275,11 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
           new mapboxgl.LngLat(center[0], center[1])
         );
 
+        console.log(
+          `Checking road feature at ${roadCoordinates}: Distance from center is ${distanceFromCenter} meters.`
+        );
+
+        // Only include roads within the specified radius
         if (distanceFromCenter <= radiusInMeters) {
           const roadName = feature.properties.name;
           if (roadName) {
@@ -263,11 +299,33 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
       console.log("No roads found within the radius");
     }
   });
+
+  console.log("Custom road layer added");
 }
 
+//=======================================================
 // Function to create a circular polygon around a given point
-function createCirclePolygon(center, radiusInKm) {
-  return turf.circle(center, radiusInKm, { steps: 64 }).geometry.coordinates;
+//=======================================================
+
+// Function to create a circular polygon around a given point
+function createCirclePolygon(center, radiusInKm, points = 64) {
+  const latitude = center[1];
+  const longitude = center[0];
+  const coordinates = [];
+
+  const distanceX =
+    radiusInKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  const distanceY = radiusInKm / 110.574;
+
+  for (let i = 0; i < points; i++) {
+    const theta = (i / points) * (2 * Math.PI);
+    const x = distanceX * Math.cos(theta);
+    const y = distanceY * Math.sin(theta);
+    coordinates.push([longitude + x, latitude + y]);
+  }
+  coordinates.push(coordinates[0]); // Close the polygon
+
+  return coordinates;
 }
 
 // Function to add the search area polygon to the map
@@ -306,17 +364,18 @@ function addSearchAreaToMap(coordinates, sourceId) {
     type: "line",
     source: sourceId,
     paint: {
-      "line-color": "#ffffff",
-      "line-width": 2,
+      "line-color": "#ffffff", // Same color as your fill border
+      "line-width": 2, // Adjust the width of the border
     },
   });
-
   console.log("Search area layer added");
 }
 
 // Function to draw the search area on the map
 function drawSearchArea(center, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
   const radiusInKm = radiusInMeters / 1000;
+
   const circlePolygon = createCirclePolygon(center, radiusInKm);
-  addSearchAreaToMap(circlePolygon, "search-area");
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
