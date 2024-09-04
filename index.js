@@ -138,7 +138,7 @@ function setupGeolocation() {
 }
 
 function addCustomRoadLayer(center) {
-  console.log("Adding custom road layer");
+  console.log("Adding custom road layer", center);
   if (map.getLayer("custom-roads")) {
     console.log("Removing existing custom road layer");
     map.removeLayer("custom-roads");
