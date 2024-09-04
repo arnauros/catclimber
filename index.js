@@ -231,20 +231,24 @@ function addCustomRoadLayer(center) {
       [
         "in",
         "class",
-        "trunk",
-        "trunk_link",
-        "primary",
-        "primary_link",
+        "motorway", // road-motorway-trunk
+        "primary", // road-primary
         "secondary",
-        "secondary_link",
-        "tertiary",
-        "tertiary_link",
-        "street",
-        "street_limited",
-        "residential",
-        "road",
-        "motorway",
-        "service",
+        "tertiary", // road-secondary-tertiary
+        "street", // road-street
+        "street_limited", // road-street-low
+        "motorway_link",
+        "trunk_link",
+        "primary_link", // road-major-link
+        "minor_link", // road-minor-link
+        "minor", // road-minor
+        "construction", // road-construction
+        "motorway_trunk_case",
+        "primary_case",
+        "secondary_tertiary_case", // road-case layers
+        "minor_link_case",
+        "minor_case",
+        "street_case", // road-minor-link-case, road-street-case
       ],
       ["in", "surface", "paved", "asphalt", "concrete"],
     ],
