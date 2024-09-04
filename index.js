@@ -47,6 +47,20 @@ function initializeMap() {
   }
 }
 
+function setupGeolocation() {
+  console.log("Setting up geolocation");
+  const geolocateButton = document.getElementById("geolocateButton");
+  if (geolocateButton) {
+    geolocateButton.addEventListener("click", function (event) {
+      console.log("Geolocation button clicked");
+      event.preventDefault();
+      attemptUserLocation();
+    });
+  } else {
+    console.error("Geolocation button not found");
+  }
+}
+
 function attemptUserLocation() {
   if ("geolocation" in navigator) {
     navigator.permissions
@@ -55,13 +69,13 @@ function attemptUserLocation() {
         if (result.state === "granted") {
           locateUser();
         } else if (result.state === "prompt") {
-          // We can't automatically trigger the prompt, but we can inform the user
-          alert(
-            "Please use the geolocation button to share your location for a better experience."
-          );
+          alert("Please allow access to your location when prompted.");
+          locateUser();
         } else if (result.state === "denied") {
           console.log("Geolocation permission denied");
-          alert("Location access is denied. Using default location.");
+          alert(
+            "Location access is denied. Please enable location services in your browser settings."
+          );
         }
       });
   } else {
@@ -91,13 +105,27 @@ function locateUser() {
     },
     function (error) {
       console.error("Geolocation error:", error);
-      alert("Unable to retrieve your location. Using default location.");
+      let errorMessage = "Unable to retrieve your location. ";
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage += "Location access was denied.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage += "Location information is unavailable.";
+          break;
+        case error.TIMEOUT:
+          errorMessage += "The request to get user location timed out.";
+          break;
+        default:
+          errorMessage += "An unknown error occurred.";
+      }
+      alert(errorMessage + " Using default location.");
       map.flyTo({ center: defaultLocation, zoom: 12 });
       addCustomRoadLayer(defaultLocation);
     },
     {
       enableHighAccuracy: true,
-      timeout: 5000,
+      timeout: 10000,
       maximumAge: 0,
     }
   );
@@ -148,20 +176,6 @@ function searchLocation(query) {
       }
     })
     .catch((error) => console.error("Geocoding API error:", error));
-}
-
-function setupGeolocation() {
-  console.log("Setting up geolocation");
-  const geolocateButton = document.getElementById("geolocateButton");
-  if (geolocateButton) {
-    geolocateButton.addEventListener("click", function (event) {
-      console.log("Geolocation button clicked");
-      event.preventDefault();
-      locateUser();
-    });
-  } else {
-    console.error("Geolocation button not found");
-  }
 }
 
 function addCustomRoadLayer(center) {
