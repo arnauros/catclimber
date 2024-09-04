@@ -187,6 +187,7 @@ function searchLocation(query) {
           zoom: 12,
         });
         addCustomRoadLayer(coordinates);
+        drawSearchArea(coordinates, 1000); // Draw radius around searched location
       } else {
         console.log("Location not found");
         alert("Location not found");
