@@ -200,23 +200,26 @@ function searchLocation(query) {
 //          Add The Road Layer
 // ======================================
 
+// Function to add the custom road layer and query all roads within the search radius
 function addCustomRoadLayer(center, radiusInMeters = 1000) {
   console.log("Adding custom road layer", center);
 
+  // Remove existing custom road layer
   if (map.getLayer("custom-roads")) {
     console.log("Removing existing custom road layer");
     map.removeLayer("custom-roads");
   }
 
+  // Add the road source if it doesn't already exist
   if (!map.getSource("custom-roads")) {
     console.log("Adding custom road source");
     map.addSource("custom-roads", {
       type: "vector",
-      url: "mapbox://mapbox.mapbox-streets-v8",
+      url: "mapbox://mapbox.mapbox-streets-v8", // Mapbox streets vector source
     });
   }
 
-  console.log("Adding custom road layer");
+  // Add the custom road layer
   map.addLayer({
     id: "custom-roads",
     type: "line",
@@ -248,50 +251,45 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
     ],
   });
 
-  // Query all road features from the source and filter by distance
-  map.on("sourcedata", () => {
-    if (map.isSourceLoaded("custom-roads")) {
-      const features = map.querySourceFeatures("custom-roads", {
-        sourceLayer: "road",
-      });
+  // Use querySourceFeatures to get all features in the tile source, independent of zoom
+  const features = map.querySourceFeatures("custom-roads", {
+    sourceLayer: "road",
+  });
 
-      const roadNames = new Set(); // Using Set to avoid duplicates
-      const filteredRoadIds = []; // Store road IDs for filtering
+  const roadNames = new Set(); // To store unique road names
 
-      features.forEach((feature) => {
-        if (feature.geometry.type === "LineString" && feature.id) {
-          // Check each coordinate of the LineString and calculate the distance
-          feature.geometry.coordinates.forEach((coord) => {
-            const roadLngLat = new mapboxgl.LngLat(coord[0], coord[1]);
-            const distanceFromCenter = roadLngLat.distanceTo(
-              new mapboxgl.LngLat(center[0], center[1])
-            );
+  features.forEach((feature) => {
+    if (feature.geometry && feature.geometry.type === "LineString") {
+      const roadCoordinates = feature.geometry.coordinates[0]; // Get the first coordinate in the LineString
+      const roadLngLat = new mapboxgl.LngLat(
+        roadCoordinates[0],
+        roadCoordinates[1]
+      );
+      const distanceFromCenter = roadLngLat.distanceTo(
+        new mapboxgl.LngLat(center[0], center[1])
+      );
 
-            if (distanceFromCenter <= radiusInMeters) {
-              const roadName = feature.properties.name || "Unnamed Road";
-              roadNames.add(roadName);
-              filteredRoadIds.push(feature.id); // Add the feature id for filtering
-              return; // Stop checking further points in the road once it's within the radius
-            }
-          });
+      // Only include roads within the specified radius
+      if (distanceFromCenter <= radiusInMeters) {
+        const roadName = feature.properties.name;
+        if (roadName) {
+          roadNames.add(roadName);
         }
-      });
-
-      // Display road names in console
-      console.log("Roads within the search area:");
-      roadNames.forEach((name) => {
-        console.log(name);
-      });
-
-      // Apply the filter only if there are valid road IDs
-      if (filteredRoadIds.length > 0) {
-        map.setFilter("custom-roads", ["in", "id", ...filteredRoadIds]);
-        console.log("Custom road layer updated with roads inside the radius");
-      } else {
-        console.log("No roads found within the radius");
       }
     }
   });
+
+  // Display road names in the console
+  console.log("Roads within the search area:");
+  if (roadNames.size > 0) {
+    roadNames.forEach((name) => {
+      console.log(name);
+    });
+  } else {
+    console.log("No roads found within the radius");
+  }
+
+  console.log("Custom road layer added");
 }
 
 // Function to create a circular polygon around a given point
