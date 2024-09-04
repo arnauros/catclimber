@@ -231,7 +231,6 @@ function addCustomRoadLayer(center) {
       [
         "in",
         "class",
-        "motorway", // road-motorway-trunk
         "primary", // road-primary
         "secondary",
         "tertiary", // road-secondary-tertiary
@@ -243,7 +242,6 @@ function addCustomRoadLayer(center) {
         "minor_link", // road-minor-link
         "minor", // road-minor
         "construction", // road-construction
-        "motorway_trunk_case",
         "primary_case",
         "secondary_tertiary_case", // road-case layers
         "minor_link_case",
