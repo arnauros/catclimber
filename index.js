@@ -9,8 +9,6 @@ const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ";
 let map;
 
-console.log("Script loaded");
-
 document.addEventListener("DOMContentLoaded", function () {
   console.log("DOMContentLoaded event fired");
   initializeMap();
