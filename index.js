@@ -83,6 +83,16 @@ function locateUser() {
   }
 }
 
+// Function to set up geolocation functionality
+function setupGeolocation() {
+  const geolocateButton = document.getElementById("geolocateButton");
+
+  geolocateButton.addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent form submission or page refresh
+    locateUser(); // Call the locateUser function when the button is clicked
+  });
+}
+
 // Function to set up search functionality
 function setupSearch() {
   // Prevent form submission
