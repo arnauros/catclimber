@@ -2,6 +2,10 @@
 
 console.log("Script started");
 
+// ======================================
+//          Map Initialization
+// ======================================
+
 // Global Variables
 const mapContainerId = "map";
 const defaultLocation = [2.154007, 41.390205];
@@ -44,6 +48,10 @@ function initializeMap() {
     console.error("Error initializing map:", error);
   }
 }
+
+// ======================================
+//      Searching For Locations
+// ======================================
 
 function setupGeolocation() {
   console.log("Setting up geolocation");
@@ -184,6 +192,10 @@ function searchLocation(query) {
     .catch((error) => console.error("Geocoding API error:", error));
 }
 
+// ======================================
+//          Add The Road Layer
+// ======================================
+
 function addCustomRoadLayer(center) {
   console.log("Adding custom road layer", center);
   if (map.getLayer("custom-roads")) {
@@ -210,7 +222,7 @@ function addCustomRoadLayer(center) {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000",
+      "line-color": "#bfb3b0",
       "line-width": 2,
       "line-opacity": 0.6,
     },
