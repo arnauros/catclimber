@@ -203,7 +203,7 @@ function addCustomRoadLayer(center) {
     },
     paint: {
       "line-color": "#FF0000", // Customize color as needed
-      "line-width": 4,
+      "line-width": 2,
     },
     filter: [
       "in",
