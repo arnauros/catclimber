@@ -141,12 +141,15 @@ function addCustomRoadLayer(center) {
     zoom: 14, // Adjust zoom level based on how close you want to see the roads
   });
 
+  // Log when the vector tiles are about to be added
+  console.log("Adding vector tile source for roads...");
+
   map.addLayer({
     id: "custom-roads",
     type: "line",
     source: {
       type: "vector",
-      url: "mapbox://mapbox.mapbox-streets-v8",
+      url: "mapbox://mapbox.mapbox-streets-v8", // Vector tile source
     },
     "source-layer": "road",
     layout: {
