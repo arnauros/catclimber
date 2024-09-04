@@ -256,9 +256,20 @@ function addCustomRoadLayer(center) {
     const roadNames = new Set(); // Using Set to avoid duplicates
 
     features.forEach((feature) => {
-      const roadName = feature.properties.name;
-      if (roadName) {
-        roadNames.add(roadName);
+      const roadCoordinates = feature.geometry.coordinates[0]; // Coordinates of the road feature
+      const roadLngLat = new mapboxgl.LngLat(
+        roadCoordinates[0],
+        roadCoordinates[1]
+      );
+      const distanceFromCenter = roadLngLat.distanceTo(
+        new mapboxgl.LngLat(center[0], center[1])
+      );
+
+      if (distanceFromCenter <= radiusInMeters) {
+        const roadName = feature.properties.name;
+        if (roadName) {
+          roadNames.add(roadName);
+        }
       }
     });
 
