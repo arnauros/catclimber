@@ -128,36 +128,32 @@ function setupGeolocation() {
 
 // Function to add a custom road layer
 function addCustomRoadLayer(center) {
+  // Check if the custom road layer already exists
   if (map.getLayer("custom-roads")) {
-    console.log("Custom road layer already exists, skipping add.");
-    return;
+    console.log("Custom road layer already exists. Removing it first.");
+    map.removeLayer("custom-roads");
   }
 
-  console.log("Adding custom road layer around:", center);
-
-  // You may wish to zoom into the location if necessary
-  map.flyTo({
-    center: center,
-    zoom: 14, // Adjust zoom level based on how close you want to see the roads
+  // Add the vector tile source for roads
+  map.addSource("custom-roads", {
+    type: "vector",
+    url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
   });
 
-  // Log when the vector tiles are about to be added
-  console.log("Adding vector tile source for roads...");
+  console.log("Custom road source added");
 
+  // Add the road layer
   map.addLayer({
     id: "custom-roads",
     type: "line",
-    source: {
-      type: "vector",
-      url: "mapbox://mapbox.mapbox-streets-v8", // Vector tile source
-    },
-    "source-layer": "road",
+    source: "custom-roads",
+    "source-layer": "road", // Specify the source layer
     layout: {
       "line-join": "round",
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000",
+      "line-color": "#FF0000", // Customize color as needed
       "line-width": 2,
       "line-opacity": 0.6,
     },
@@ -179,10 +175,10 @@ function addCustomRoadLayer(center) {
       "road-primary",
       "road-secondary",
       "road-street",
-    ],
+    ], // Only show roads that match these classes
   });
 
-  console.log("Custom road layer added.");
+  console.log("Custom road layer added");
 }
 // Function to create a circular polygon around a given point
 function createCirclePolygon(center, radiusInKm, points = 64) {
