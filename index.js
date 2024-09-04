@@ -250,7 +250,7 @@ function addCustomRoadLayer(center) {
         "minor_case",
         "street_case", // road-minor-link-case, road-street-case
       ],
-      ["in", "surface", "paved", "asphalt", "concrete"],
+      // ["in", "surface", "paved", "asphalt", "concrete"],
     ],
   });
   console.log("Custom road layer added");
