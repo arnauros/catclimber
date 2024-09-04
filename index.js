@@ -256,23 +256,25 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
     const roadNames = new Set(); // Using Set to avoid duplicates
 
     features.forEach((feature) => {
-      const roadCoordinates = feature.geometry.coordinates[0]; // Coordinates of the road feature
-      const roadLngLat = new mapboxgl.LngLat(
-        roadCoordinates[0],
-        roadCoordinates[1]
-      );
-      const distanceFromCenter = roadLngLat.distanceTo(
-        new mapboxgl.LngLat(center[0], center[1])
-      );
+      const roadCoordinates = feature.geometry.coordinates;
 
-      if (distanceFromCenter <= radiusInMeters) {
-        const roadName = feature.properties.name;
-        if (roadName) {
+      // For LineString geometries
+      if (feature.geometry.type === "LineString") {
+        const roadLngLat = new mapboxgl.LngLat(
+          roadCoordinates[0][0], // Longitude
+          roadCoordinates[0][1] // Latitude
+        );
+
+        const distanceFromCenter = roadLngLat.distanceTo(
+          new mapboxgl.LngLat(center[0], center[1])
+        );
+
+        if (distanceFromCenter <= radiusInMeters) {
+          const roadName = feature.properties.name || "Unnamed Road";
           roadNames.add(roadName);
         }
       }
     });
-
     // Display road names in console
     console.log("Roads within the search area:");
     roadNames.forEach((name) => {
