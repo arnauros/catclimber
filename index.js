@@ -251,46 +251,61 @@ function addCustomRoadLayer(center, radiusInMeters = 1000) {
     ],
   });
 
-  // Use querySourceFeatures to get all features in the tile source, independent of zoom
-  const features = map.querySourceFeatures("custom-roads", {
-    sourceLayer: "road",
-  });
+  // Wait until the layer is fully loaded
+  map.on("idle", () => {
+    console.log("Map is idle, querying source features.");
 
-  const roadNames = new Set(); // To store unique road names
+    // Use querySourceFeatures to get all features in the tile source
+    const features = map.querySourceFeatures("custom-roads", {
+      sourceLayer: "road",
+    });
 
-  features.forEach((feature) => {
-    if (feature.geometry && feature.geometry.type === "LineString") {
-      const roadCoordinates = feature.geometry.coordinates[0]; // Get the first coordinate in the LineString
-      const roadLngLat = new mapboxgl.LngLat(
-        roadCoordinates[0],
-        roadCoordinates[1]
-      );
-      const distanceFromCenter = roadLngLat.distanceTo(
-        new mapboxgl.LngLat(center[0], center[1])
-      );
+    console.log(`Found ${features.length} road features in the source.`);
 
-      // Only include roads within the specified radius
-      if (distanceFromCenter <= radiusInMeters) {
-        const roadName = feature.properties.name;
-        if (roadName) {
-          roadNames.add(roadName);
+    const roadNames = new Set(); // To store unique road names
+
+    features.forEach((feature) => {
+      if (feature.geometry && feature.geometry.type === "LineString") {
+        const roadCoordinates = feature.geometry.coordinates[0]; // Get the first coordinate in the LineString
+        const roadLngLat = new mapboxgl.LngLat(
+          roadCoordinates[0],
+          roadCoordinates[1]
+        );
+        const distanceFromCenter = roadLngLat.distanceTo(
+          new mapboxgl.LngLat(center[0], center[1])
+        );
+
+        console.log(
+          `Checking road feature at ${roadCoordinates}: Distance from center is ${distanceFromCenter} meters.`
+        );
+
+        // Only include roads within the specified radius
+        if (distanceFromCenter <= radiusInMeters) {
+          const roadName = feature.properties.name;
+          if (roadName) {
+            roadNames.add(roadName);
+          }
         }
       }
+    });
+
+    // Display road names in console
+    if (roadNames.size > 0) {
+      console.log("Roads within the search area:");
+      roadNames.forEach((name) => {
+        console.log(name);
+      });
+    } else {
+      console.log("No roads found within the radius");
     }
   });
 
-  // Display road names in the console
-  console.log("Roads within the search area:");
-  if (roadNames.size > 0) {
-    roadNames.forEach((name) => {
-      console.log(name);
-    });
-  } else {
-    console.log("No roads found within the radius");
-  }
-
   console.log("Custom road layer added");
 }
+
+//=======================================================
+// Function to create a circular polygon around a given point
+//=======================================================
 
 // Function to create a circular polygon around a given point
 function createCirclePolygon(center, radiusInKm, points = 64) {
