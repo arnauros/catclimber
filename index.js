@@ -39,6 +39,8 @@ function initializeMap() {
       console.log("Map has loaded successfully.");
       setupGeolocation();
       setupSearch();
+      addCustomRoadLayer(defaultLocation); // Add this line
+      locateUser();
     });
   } catch (error) {
     console.error("Error initializing map:", error);
