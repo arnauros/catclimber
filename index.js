@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
   map.on("load", () => {
     setupGeolocation(); // Set up geolocation functionality
     setupSearch(); // Set up search functionality
-    addCustomRoadLayer(defaultLocation); // Add custom road layer to the map
   });
 });
 
@@ -51,18 +50,21 @@ function locateUser() {
         });
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
         addCustomRoadLayer(userCoordinates);
+        drawSearchArea(userCoordinates, 1000); // Add the search area circle
       },
       function (error) {
         console.error("Error getting geolocation:", error);
         // Fallback to default location (Barcelona) if geolocation fails
         map.flyTo({ center: defaultLocation, zoom: 12 });
         addCustomRoadLayer(defaultLocation);
+        drawSearchArea(defaultLocation, 1000); // Add the search area circle for default location
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
     map.flyTo({ center: defaultLocation, zoom: 12 });
     addCustomRoadLayer(defaultLocation);
+    drawSearchArea(defaultLocation, 1000); // Add the search area circle for default location
   }
 }
 
@@ -99,6 +101,7 @@ function searchLocation(query) {
         });
 
         addCustomRoadLayer(coordinates);
+        drawSearchArea(coordinates, 1000); // Add the search area circle
       } else {
         alert("Location not found");
       }
@@ -119,8 +122,9 @@ function setupGeolocation() {
 
 // Function to add a custom road layer
 function addCustomRoadLayer(center) {
-  if (!map.isStyleLoaded()) {
-    console.error("Map style not fully loaded yet.");
+  // Check if the layer already exists before adding it
+  if (map.getLayer("custom-roads")) {
+    console.log("Custom road layer already exists, skipping add.");
     return;
   }
 
@@ -129,15 +133,15 @@ function addCustomRoadLayer(center) {
     type: "line",
     source: {
       type: "vector",
-      url: "mapbox://mapbox.mapbox-streets-v8", // Ensure this is correct
+      url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
     },
-    "source-layer": "road", // Ensure the source layer name is correct
+    "source-layer": "road", // Specify the source layer
     layout: {
       "line-join": "round",
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000",
+      "line-color": "#FF0000", // Customize color as needed
       "line-width": 2,
       "line-opacity": 0.6,
     },
@@ -188,6 +192,13 @@ function createCirclePolygon(center, radiusInKm, points = 64) {
 
 // Function to add the search area polygon to the map
 function addSearchAreaToMap(coordinates, sourceId) {
+  if (map.getLayer("search-area-layer")) {
+    map.removeLayer("search-area-layer");
+  }
+  if (map.getSource(sourceId)) {
+    map.removeSource(sourceId);
+  }
+
   map.addSource(sourceId, {
     type: "geojson",
     data: {
@@ -210,4 +221,13 @@ function addSearchAreaToMap(coordinates, sourceId) {
   });
 
   console.log("Search area layer added");
+}
+
+// Function to draw the search area on the map
+function drawSearchArea(center, radiusInMeters) {
+  const searchAreaSourceId = "search-area";
+  const radiusInKm = radiusInMeters / 1000;
+
+  const circlePolygon = createCirclePolygon(center, radiusInKm);
+  addSearchAreaToMap(circlePolygon, searchAreaSourceId);
 }
