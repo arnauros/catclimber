@@ -90,6 +90,7 @@ function fallbackToIPGeolocation() {
     .then((data) => {
       const ipBasedLocation = [data.longitude, data.latitude];
       updateMapWithLocation(ipBasedLocation);
+      drawSearchArea(ipBasedLocation, 1000); // Draw radius for IP-based location
       alert(
         "Using approximate location based on your IP address. For more accurate results, please enable location services."
       );
@@ -116,6 +117,7 @@ function locateUser() {
       });
       new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
       addCustomRoadLayer(userCoordinates);
+      drawSearchArea(userCoordinates, 1000); // Draw radius around the user's location
     },
     function (error) {
       console.error("Geolocation error:", error);
@@ -136,6 +138,7 @@ function locateUser() {
       alert(errorMessage + " Using default location.");
       map.flyTo({ center: defaultLocation, zoom: 12 });
       addCustomRoadLayer(defaultLocation);
+      drawSearchArea(defaultLocation, 1000); // Draw radius for default location
     },
     {
       enableHighAccuracy: true,
