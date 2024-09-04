@@ -35,6 +35,9 @@ function initializeMap() {
   });
 }
 
+console.log("Layers:", map.getStyle().layers);
+console.log("Sources:", map.getStyle().sources);
+
 // Function to automatically locate the user on page load
 function locateUser() {
   if ("geolocation" in navigator) {
