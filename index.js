@@ -1,91 +1,101 @@
 "use strict";
 
-// Mapbox PROJECT STARTS HERE
+console.log("Script started");
 
 // Global Variables
-const mapContainerId = "map"; // ID of the map div
-const defaultLocation = [2.154007, 41.390205]; // Default location (Barcelona coordinates)
+const mapContainerId = "map";
+const defaultLocation = [2.154007, 41.390205];
 const mapboxToken =
   "pk.eyJ1IjoiYXJuYXVyb3MiLCJhIjoiY20wYXNqOTU2MDEzYzJtc2Q0MXRpMjlnciJ9.UPU3udIJIprlj7HXDDgrbQ";
-let map; // Declare map variable globally so it can be accessed by other functions
+let map;
 
-// Ensure the DOM is fully loaded before running the script
 document.addEventListener("DOMContentLoaded", function () {
-  initializeMap(); // Call the function to initialize the map
-  map.on("load", () => {
-    console.log("Map has loaded successfully.");
-    setupGeolocation(); // Set up geolocation functionality
-    setupSearch(); // Set up search functionality
-  });
+  console.log("DOMContentLoaded event fired");
+  initializeMap();
 });
 
-// Function to initialize the map
 function initializeMap() {
+  console.log("Initializing map");
   if (typeof mapboxgl === "undefined") {
     console.error("Mapbox GL JS is not loaded.");
     return;
   }
 
+  console.log("Mapbox GL JS is loaded");
   mapboxgl.accessToken = mapboxToken;
 
-  map = new mapboxgl.Map({
-    container: mapContainerId, // ID of the map container
-    style: "mapbox://styles/mapbox/outdoors-v11", // Map style
-    center: defaultLocation, // Default center location
-    zoom: 10, // Default zoom level
-  });
+  try {
+    map = new mapboxgl.Map({
+      container: mapContainerId,
+      style: "mapbox://styles/mapbox/outdoors-v11",
+      center: defaultLocation,
+      zoom: 10,
+    });
+    console.log("Map object created");
 
-  console.log("Map initialized with center at:", defaultLocation);
+    map.on("load", () => {
+      console.log("Map has loaded successfully.");
+      setupGeolocation();
+      setupSearch();
+    });
+  } catch (error) {
+    console.error("Error initializing map:", error);
+  }
 }
 
-// Function to automatically locate the user on page load
 function locateUser() {
+  console.log("Attempting to locate user");
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       function (position) {
+        console.log("Geolocation successful");
         const userCoordinates = [
           position.coords.longitude,
           position.coords.latitude,
         ];
+        console.log("User coordinates:", userCoordinates);
         map.flyTo({
           center: userCoordinates,
-          zoom: 12, // Adjust zoom level as needed
+          zoom: 12,
         });
-        console.log("User location found:", userCoordinates);
-
         new mapboxgl.Marker().setLngLat(userCoordinates).addTo(map);
         addCustomRoadLayer(userCoordinates);
       },
       function (error) {
-        console.error("Error getting geolocation:", error);
-        // Fallback to default location (Barcelona) if geolocation fails
+        console.error("Geolocation error:", error);
         map.flyTo({ center: defaultLocation, zoom: 12 });
         addCustomRoadLayer(defaultLocation);
       }
     );
   } else {
-    console.error("Geolocation is not supported by this browser.");
+    console.error("Geolocation is not supported");
     map.flyTo({ center: defaultLocation, zoom: 12 });
     addCustomRoadLayer(defaultLocation);
   }
 }
 
-// Function to set up search functionality
 function setupSearch() {
+  console.log("Setting up search");
   const searchButton = document.getElementById("searchButton");
-  searchButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    const query = document.getElementById("searchLocate").value;
-    if (query) {
-      searchLocation(query);
-    } else {
-      alert("Please enter a location to search");
-    }
-  });
+  if (searchButton) {
+    searchButton.addEventListener("click", function (event) {
+      console.log("Search button clicked");
+      event.preventDefault();
+      const query = document.getElementById("searchLocate").value;
+      if (query) {
+        searchLocation(query);
+      } else {
+        console.log("Empty search query");
+        alert("Please enter a location to search");
+      }
+    });
+  } else {
+    console.error("Search button not found");
+  }
 }
 
-// Function to search for a location using the Mapbox Geocoding API
 function searchLocation(query) {
+  console.log("Searching for location:", query);
   const geocodingUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
   )}.json?access_token=${mapboxToken}`;
@@ -93,67 +103,65 @@ function searchLocation(query) {
   fetch(geocodingUrl)
     .then((response) => response.json())
     .then((data) => {
+      console.log("Geocoding API response received");
       if (data.features.length > 0) {
         const coordinates = data.features[0].center;
         const placeName = data.features[0].place_name;
-
+        console.log("Location found:", placeName, coordinates);
         map.flyTo({
           center: coordinates,
           zoom: 12,
         });
-
-        console.log(
-          `Location found for search query: ${placeName}`,
-          coordinates
-        );
-
         addCustomRoadLayer(coordinates);
       } else {
+        console.log("Location not found");
         alert("Location not found");
       }
     })
-    .catch((error) => console.error("Error:", error));
+    .catch((error) => console.error("Geocoding API error:", error));
 }
 
-// Function to set up geolocation functionality
 function setupGeolocation() {
+  console.log("Setting up geolocation");
   const geolocateButton = document.getElementById("geolocateButton");
-
-  geolocateButton.addEventListener("click", function (event) {
-    event.preventDefault(); // Prevent any default behavior
-
-    locateUser(); // Call the locateUser function when the button is clicked
-  });
+  if (geolocateButton) {
+    geolocateButton.addEventListener("click", function (event) {
+      console.log("Geolocation button clicked");
+      event.preventDefault();
+      locateUser();
+    });
+  } else {
+    console.error("Geolocation button not found");
+  }
 }
 
-// Function to add a custom road layer
 function addCustomRoadLayer(center) {
-  // Check if the custom road layer already exists
+  console.log("Adding custom road layer");
   if (map.getLayer("custom-roads")) {
-    console.log("Custom road layer already exists. Removing it first.");
+    console.log("Removing existing custom road layer");
     map.removeLayer("custom-roads");
   }
 
-  // Add the vector tile source for roads
-  map.addSource("custom-roads", {
-    type: "vector",
-    url: "mapbox://mapbox.mapbox-streets-v8", // This is Mapbox's vector tile source for streets
-  });
+  if (!map.getSource("custom-roads")) {
+    console.log("Adding custom road source");
+    map.addSource("custom-roads", {
+      type: "vector",
+      url: "mapbox://mapbox.mapbox-streets-v8",
+    });
+  }
 
-  console.log("Custom road source added");
-
-  // Add the road layer
+  console.log("Adding custom road layer");
   map.addLayer({
     id: "custom-roads",
     type: "line",
     source: "custom-roads",
-    "source-layer": "road", // Specify the source layer
+    "source-layer": "road",
     layout: {
       "line-join": "round",
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#FF0000", // Customize color as needed
+      "line-color": "#FF0000",
       "line-width": 2,
       "line-opacity": 0.6,
     },
@@ -175,9 +183,8 @@ function addCustomRoadLayer(center) {
       "road-primary",
       "road-secondary",
       "road-street",
-    ], // Only show roads that match these classes
+    ],
   });
-
   console.log("Custom road layer added");
 }
 // Function to create a circular polygon around a given point
