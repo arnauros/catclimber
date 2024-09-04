@@ -247,8 +247,31 @@ function addCustomRoadLayer(center) {
       // ["in", "surface", "paved", "asphalt", "concrete"],
     ],
   });
+  // Query for roads within the viewport and log the names
+  map.on("idle", () => {
+    const features = map.queryRenderedFeatures({
+      layers: ["custom-roads"],
+    });
+
+    const roadNames = new Set(); // Using Set to avoid duplicates
+
+    features.forEach((feature) => {
+      const roadName = feature.properties.name;
+      if (roadName) {
+        roadNames.add(roadName);
+      }
+    });
+
+    // Display road names in console
+    console.log("Roads within the search area:");
+    roadNames.forEach((name) => {
+      console.log(name);
+    });
+  });
+
   console.log("Custom road layer added");
 }
+
 // Function to create a circular polygon around a given point
 function createCirclePolygon(center, radiusInKm, points = 64) {
   const latitude = center[1];
